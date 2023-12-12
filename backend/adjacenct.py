@@ -3,15 +3,25 @@ import math
 import sqlite3
 
 def calculate_distance(lat1, lng1, lat2, lng2):
-    return (lat1 - lat2) ** 2 + (lng1 - lng2) ** 2
+    return float((lat1 - lat2) ** 2 + (lng1 - lng2) ** 2)
 
 def min_per_rail(station, railroad):
     for coord in json.loads(railroad[4]):
-            min_val = math.inf
-            dist = calculate_distance(station[3], station[2], coord[1], coord[0])
-            min_val = min(min_val, dist)
+        min_val = math.inf
+        dist = calculate_distance(station[3], station[2], coord[1], coord[0])
+        min_val = min(min_val, dist)
     return min_val
 
+def internal_dist(railroad):
+    coordinates = json.loads(railroad[4])  # Assuming railroad[4] contains the line_data in JSON format
+    total_distance = 0
+
+    for i in range(len(coordinates) - 1):
+        lat1, lng1 = coordinates[i]
+        lat2, lng2 = coordinates[i + 1]
+        total_distance += calculate_distance(lat1, lng1, lat2, lng2)
+
+    return float(total_distance)
 
 def find_two_closest_lines(station, railroads):
     min1 = float('inf')
@@ -48,7 +58,14 @@ def update_adjacency(conn, line_ids):
             cursor.execute("UPDATE railroads SET adjacency = True WHERE id = ?", (line_id,))
     conn.commit()
 
-db_path = 'railroads.db'
+def update_internal_dist(conn, railroads):
+    cursor = conn.cursor()
+    for railroad in railroads:
+        dist = internal_dist(railroad)
+        cursor.execute("UPDATE railroads SET internal_dist = ? WHERE id = ?", (dist, railroad[0]))
+    conn.commit()
+
+db_path = r'Dyanmo\frontend\railroads.db'
 conn = sqlite3.connect(db_path)
 
 cursor = conn.cursor()
@@ -71,6 +88,9 @@ for station in stations:
     adj_matrix[station[0]] = [closest_lines[0], closest_lines[1]]
     update_adjacency(conn, closest_lines)
     #print(f"The two closest lines to station {station[0]} are {closest_lines[0]} and {closest_lines[1]}")
+
+update_internal_dist(conn, railroads)
+
 
 # Close the database connection
 conn.close()
