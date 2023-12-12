@@ -56,7 +56,17 @@ for idx, polyline in polylines_gdf.iterrows():
     # Finding other polylines that touch the current one
     adjacent_polylines = polylines_gdf[polylines_gdf.geometry.touches(polyline.geometry) & (polylines_gdf.index != idx)]
     # Store the IDs or indices of adjacent polylines
-    polylines_gdf.at[idx, 'adjacent_ids'] = adjacent_polylines.index.tolist()
+    polylines_gdf.at[idx, 'adjacent_ids'] = adjacent_polylines['id'].tolist()
+
+# Assuming polylines_gdf has a column 'adjacent_ids' which are lists of indices
+for idx, row in polylines_gdf.iterrows():
+    # Convert list of adjacent_ids to a string
+    adjacent_ids_str = ','.join(row['adjacent_ids'])
+    print(row['id'] + ": ")
+    print(adjacent_ids_str)
+
+    # Update the database row with the adjacent_ids
+    conn.execute("UPDATE geojson_features SET adjacent_ids = ? WHERE id = ?", (adjacent_ids_str, row['id']))
 
 conn.commit()
 conn.close()
