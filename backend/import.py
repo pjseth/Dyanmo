@@ -14,17 +14,17 @@ def read_geojson(file_path):
 def create_database(db_name):
     conn = sqlite3.connect(db_name)
     conn.execute('''CREATE TABLE IF NOT EXISTS railroads (
-                    id TEXT, name TEXT, latitude REAL, longitude REAL, 
-                    line_data TEXT, current_pop INTEGER, max_capacity INTEGER)''')
+                    id TEXT, name TEXT, longitude REAL, latitude REAL, 
+                    line_data TEXT, current_pop INTEGER, max_capacity INTEGER, adjacency BOOLEAN)''')
     return conn
 
 def insert_railroad_names(conn, names):
     cursor = conn.cursor()
     for entry in names:
         # Insert data based on feature type
-        cursor.execute('''INSERT INTO railroads (id, name, latitude, longitude, 
-                       line_data, current_pop, max_capacity) VALUES 
-                       (?, ?, ?, ?, ?, NULL, NULL)''', entry)
+        cursor.execute('''INSERT INTO railroads (id, name, longitude, latitude, 
+                       line_data, current_pop, max_capacity, adjacency) VALUES 
+                       (?, ?, ?, ?, ?, 100, 1000, FALSE)''', entry)
     conn.commit()
 
 def main():
@@ -38,8 +38,8 @@ def main():
         print(id_value)
 
         if feature['geometry']['type'] == 'Point':
-            latit, longit = feature['geometry']['coordinates']
-            railroad_names.append((id_value, name_value, latit, longit, None))
+            longit, latit = feature['geometry']['coordinates']
+            railroad_names.append((id_value, name_value, longit, latit, None))
         elif feature['geometry']['type'] == 'LineString':
             # Convert line coordinates to a string or a suitable format
             line_data = str(feature['geometry']['coordinates'])
