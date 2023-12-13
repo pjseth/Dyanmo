@@ -8,7 +8,7 @@ The backend supports integrating the supply data (assumed to be given to the NEO
 
 On the repo, simply follow to path of the frontend static folder
 Run the script:
-python3 server.py
+`python3 server.py`
 Connect to localhost: 8000 to see results
 
 ## Further Exploration
