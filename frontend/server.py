@@ -47,12 +47,58 @@ def update_capacity():
 
     return jsonify({"status": "success", "id": station_id, "new_max_capacity": new_capacity})
 
+@app.route('/api/updatePersonnelNeeded', methods=['POST'])
+def update_personnel_needed():
+    data = request.json
+    station_id = data['id']
+    new_personnel_needed = data['newValue']
+
+    # Update the database with the new capacity
+    conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
+    cursor = conn.cursor()
+    cursor.execute("UPDATE railroads SET personnel_needed = ? WHERE id = ?", (new_personnel_needed, station_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status": "success", "id": station_id, "new_personnel_needed": new_personnel_needed})
+
+@app.route('/api/updatePersonnelPresent', methods=['POST'])
+def update_personnel_present():
+    data = request.json
+    print(data)
+    station_id = data['id']
+    new_personnel_present = data['newValue']
+
+    # Update the database with the new capacity
+    conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
+    cursor = conn.cursor()
+    cursor.execute("UPDATE railroads SET personnel_present = ? WHERE id = ?", (new_personnel_present, station_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status": "success", "id": station_id, "new_personnel_present": new_personnel_present})
+
+@app.route('/api/updateTransport', methods=['POST'])
+def update_transport():
+    data = request.json
+    station_id = data['id']
+    new_transport = data['newValue']
+
+    # Update the database with the new capacity
+    conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
+    cursor = conn.cursor()
+    cursor.execute("UPDATE railroads SET transport = ? WHERE id = ?", (new_transport, station_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status": "success", "id": station_id, "new_transport": new_transport})
+
 def get_capacity_data():
     # Assuming railroads.db is in the same directory as server.py
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
-    cursor.execute("SELECT id, current_pop, max_capacity FROM railroads")
-    data = {id: {"current_population": current_pop, "max_capacity": max_cap} for id, current_pop, max_cap in cursor.fetchall()}
+    cursor.execute("SELECT id, current_pop, max_capacity, personnel_needed, personnel_present, transport FROM railroads")
+    data = {id: {"current_population": current_pop, "max_capacity": max_cap, "personnel_needed": personnel_needed, "personnel_present": personnel_present, "transport": transport} for id, current_pop, max_cap, personnel_needed, personnel_present, transport in cursor.fetchall()}
     conn.close()
     return data
 

@@ -3,7 +3,7 @@ import math
 import sqlite3
 
 def calculate_distance(lat1, lng1, lat2, lng2):
-    return float((lat1 - lat2) ** 2 + (lng1 - lng2) ** 2)
+    return math.sqrt((lat1 - lat2) ** 2 + (lng1 - lng2) ** 2)
 
 def min_per_rail(station, railroad):
     for coord in json.loads(railroad[4]):

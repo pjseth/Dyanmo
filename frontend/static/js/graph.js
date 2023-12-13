@@ -1,10 +1,12 @@
 class Node {
-    constructor(name, lat, lon, current_pop = 0, max_capacity = 0) {
+    constructor(name, lat, lon, current_pop = 0, max_capacity = 0, personnel_present = 0, personnel_needed = 0) {
         this.name = name;
         this.lat = lat;
         this.lon = lon;
         this.current_pop = current_pop;
         this.max_capacity = max_capacity;  // Maximum capacity at the node
+        this.personnel_needed = personnel_needed;
+        this.personnel_present = personnel_present;
     }
 }
 

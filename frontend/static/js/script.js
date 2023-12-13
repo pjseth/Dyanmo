@@ -21,14 +21,24 @@ function handleRailLines(feature, layer) {
             <strong>${getEnglishName(feature.properties)}</strong><br>
             Current Population: <span id="population-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
             <input type="number" id="new-population-${feature.id}" placeholder="Enter new population">
-            <button onclick="updateValue('${feature.id}', 'population')">Update Population</button><br>
+            <button onclick="updateValue('${feature.id}', 'population')">Update Population Value</button><br>
             Max Capacity: <span id="capacity-${feature.id}">${capacityData[feature.id]?.max_capacity || 'N/A'}</span><br>
             <input type="number" id="new-capacity-${feature.id}" placeholder="Enter new max capacity">
-            <button onclick="updateValue('${feature.id}', 'capacity')">Update Max Capacity</button>
+            <button onclick="updateValue('${feature.id}', 'capacity')">Update Max Capacity</button><br>
+            Personnel Needed: <span id="personnelNeeded-${feature.id}">${capacityData[feature.id]?.personnel_needed || 'N/A'}</span><br>
+            <input type="number" id="new-personnelNeeded-${feature.id}" placeholder="Enter personnel needed">
+            <button onclick="updateValue('${feature.id}', 'personnelNeeded')">Update Personnel Needed</button><br>
+            Personnel Present: <span id="personnelPresent-${feature.id}">${capacityData[feature.id]?.personnel_present || 'N/A'}</span><br>
+            <input type="number" id="new-personnelPresent-${feature.id}" placeholder="Enter personnel present">
+            <button onclick="updateValue('${feature.id}', 'personnelPresent')">Update Personnel Present</button><br>
+            Transport Methods: <span id="transport-${feature.id}">${capacityData[feature.id]?.transport || 'N/A'}</span><br>
+            <input type="number" id="new-transport-${feature.id}" placeholder="Enter new transport">
+            <button onclick="updateValue('${feature.id}', 'transport')">Update Transport Method</button>
         `;
         layer.bindPopup(popupContent);
     }
 }
+
 
 // Function to handle stations
 function handleStations(feature, latlng) {
@@ -37,17 +47,28 @@ function handleStations(feature, latlng) {
             <strong>${getEnglishName(feature.properties)}</strong><br>
             Current Population: <span id="population-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
             <input type="number" id="new-population-${feature.id}" placeholder="Enter new population">
-            <button onclick="updateValue('${feature.id}', 'population')">Update Population</button><br>
+            <button onclick="updateValue('${feature.id}', 'population')">Update Population Value</button><br>
             Max Capacity: <span id="capacity-${feature.id}">${capacityData[feature.id]?.max_capacity || 'N/A'}</span><br>
             <input type="number" id="new-capacity-${feature.id}" placeholder="Enter new max capacity">
-            <button onclick="updateValue('${feature.id}', 'capacoty')">Update Max Capacity</button>
+            <button onclick="updateValue('${feature.id}', 'capacity')">Update Max Capacity</button><br>
+            Personnel Needed: <span id="personnelNeeded-${feature.id}">${capacityData[feature.id]?.personnel_needed || 'N/A'}</span><br>
+            <input type="number" id="new-personnelNeeded-${feature.id}" placeholder="Enter personnel needed">
+            <button onclick="updateValue('${feature.id}', 'personnelNeeded')">Update Personnel Needed</button><br>
+            Personnel Present: <span id="personnelPresent-${feature.id}">${capacityData[feature.id]?.personnel_present || 'N/A'}</span><br>
+            <input type="number" id="new-personnelPresent-${feature.id}" placeholder="Enter personnel present">
+            <button onclick="updateValue('${feature.id}', 'personnelPresent')">Update Personnel Present</button><br>
+            Transport Methods: <span id="transport-${feature.id}">${capacityData[feature.id]?.transport || 'N/A'}</span><br>
+            <input type="number" id="new-transport-${feature.id}" placeholder="Enter new transport">
+            <button onclick="updateValue('${feature.id}', 'transport')">Update Transport Method</button>
         `;
         return L.marker(latlng).bindPopup(popupContent);
     }
 }
 
-// Function to update the population
+
+// Function to update the values
 function updateValue(stationId, type) {
+    console.log(type, stationId)
     const newValue = document.getElementById(`new-${type}-${stationId}`).value;
 
     // Proceed only if newValue is not empty
@@ -62,9 +83,23 @@ function updateValue(stationId, type) {
         .then(response => response.json())
         .then(data => {
             console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} updated:`, data);
-            capacityData[stationId][`current_${type}`] = newValue;
-            // Update the displayed label
-            document.getElementById(`${type === 'population' ? 'population' : 'capacity'}-${stationId}`).textContent = newValue;
+            // Update the displayed label based on type
+            if (type === 'population') {
+                capacityData[stationId].current_population = newValue;
+                document.getElementById(`population-${stationId}`).textContent = newValue;
+            } else if (type === 'capacity') {
+                capacityData[stationId].max_capacity = newValue;
+                document.getElementById(`capacity-${stationId}`).textContent = newValue;
+            } else if (type === 'personnelNeeded') {
+                capacityData[stationId].personnel_needed = newValue;
+                document.getElementById(`personnelNeeded-${stationId}`).textContent = newValue;
+            } else if (type === 'personnelPresent') {
+                capacityData[stationId].personnel_present = newValue;
+                document.getElementById(`personnelPresent-${stationId}`).textContent = newValue;
+            } else if (type === 'transport') {
+                capacityData[stationId].transport = newValue;
+                document.getElementById(`transport-${stationId}`).textContent = newValue;
+            }
         })
         .catch((error) => {
             console.error(`Error updating ${type}:`, error);
@@ -93,3 +128,6 @@ fetch('/api/capacities')
             .catch(error => console.error('Error loading GeoJSON:', error));
     })
     .catch(error => console.error('Error fetching capacities:', error));
+
+
+var evacuationTime = 50; // Initial evacuation time in minutes, adjust as needed
