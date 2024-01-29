@@ -1,0 +1,488 @@
+{
+    "type": "FeatureCollection",
+    "generator": "overpass-turbo",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+    "timestamp": "2023-10-25T02:21:15Z",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "AP Casey",
+          "DwellTimeThresholdInDays": "3",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "500",
+          "FullOperatingCapacity": "500",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Company",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "20",
+          "PersonnelRequiredForProcessingNCEs": "50",
+          "PersonnelRequiredForServices": "20",
+          "PersonnelRequiredForTransportationAndLogistics": "20",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.0646
+              37.9045
+            ],
+            [
+              127.0646
+              37.9045
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "AP Yongsan",
+          "DwellTimeThresholdInDays": "3",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "2000",
+          "FullOperatingCapacity": "2000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "2 Company",
+          "PersonnelRequiredForMissionCommand": "30",
+          "PersonnelRequiredForSecurity": "100",
+          "PersonnelRequiredForProcessingNCEs": "50",
+          "PersonnelRequiredForServices": "50",
+          "PersonnelRequiredForTransportationAndLogistics": "50",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              126.9674
+              37.5248
+            ],
+            [
+              126.9674
+              37.5248
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Humphreys",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "20000",
+          "FullOperatingCapacity": "20000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "50",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "120",
+          "PersonnelRequiredForServices": "140",
+          "PersonnelRequiredForTransportationAndLogistics": "100",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.0752
+              36.9622
+            ],
+            [
+              127.0752
+              36.9622
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Daegu",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "10000",
+          "FullOperatingCapacity": "20000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "14",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "60",
+          "PersonnelRequiredForServices": "60",
+          "PersonnelRequiredForTransportationAndLogistics": "60",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              128.5573
+              35.8939
+            ],
+            [
+              128.5573
+              35.8939
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Yeosu",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "5000",
+          "FullOperatingCapacity": "25000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "14",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "60",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "120",
+          "PersonnelRequiredForServices": "140",
+          "PersonnelRequiredForTransportationAndLogistics": "100",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.6698
+              34.7815
+            ],
+            [
+              127.6698
+              34.7815
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "APOE Gimhae",
+          "DwellTimeThresholdInDays": "1",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "1000",
+          "FullOperatingCapacity": "1000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "20",
+          "PersonnelRequiredForServices": "0",
+          "PersonnelRequiredForTransportationAndLogistics": "0",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              128.7749
+              35.2549
+            ],
+            [
+              128.7749
+              35.2549
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "APOE Yeosu",
+          "DwellTimeThresholdInDays": "1",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "1000",
+          "FullOperatingCapacity": "1000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "20",
+          "PersonnelRequiredForServices": "0",
+          "PersonnelRequiredForTransportationAndLogistics": "0",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.6698
+              34.7815
+            ],
+            [
+              127.0646
+              37.9045
+            ]
+          ]
+        },
+      },
+      {	
+        "type": "Feature",
+        "properties": {
+          "Nodes": "SPOE Busan",
+          "DwellTimeThresholdInDays": "1",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "1000",
+          "FullOperatingCapacity": "1000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "20",
+          "PersonnelRequiredForServices": "0",
+          "PersonnelRequiredForTransportationAndLogistics": "0",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              129.0443
+              35.1109
+            ],
+            [
+              129.0443
+              35.1109
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "SPOE Yeosu",
+          "DwellTimeThresholdInDays": "1",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "1000",
+          "FullOperatingCapacity": "1000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "20",
+          "PersonnelRequiredForSecurity": "0",
+          "PersonnelRequiredForProcessingNCEs": "20",
+          "PersonnelRequiredForServices": "0",
+          "PersonnelRequiredForTransportationAndLogistics": "0",
+          "Notes": ""
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.6698
+              34.7815
+            ],
+            [
+              127.6698
+              34.7815
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Muan",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Alternate",
+          "InitialOperatingCapacity": "10000",
+          "FullOperatingCapacity": "20000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "1",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "40",
+          "PersonnelRequiredForSecurity": "150",
+          "PersonnelRequiredForProcessingNCEs": "80",
+          "PersonnelRequiredForServices": "80",
+          "PersonnelRequiredForTransportationAndLogistics": "80",
+          "Notes": "Alternate node used to alleviate capacity concerns at RC"
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              126.3999
+              34.9841
+            ],
+            [
+              126.3999
+              34.9841
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Suncheon",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Alternate",
+          "InitialOperatingCapacity": "7000",
+          "FullOperatingCapacity": "15000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "1",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "50",
+          "PersonnelRequiredForSecurity": "150",
+          "PersonnelRequiredForProcessingNCEs": "100",
+          "PersonnelRequiredForServices": "100",
+          "PersonnelRequiredForTransportationAndLogistics": "70",
+          "Notes": "Alternate node used to alleviate capacity concerns at RCs."
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              127.4726
+              34.9831
+            ],
+            [
+              127.4726
+              34.9831
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "RC Sacheon",
+          "DwellTimeThresholdInDays": "10",
+          "Category": "Alternate",
+          "InitialOperatingCapacity": "10000",
+          "FullOperatingCapacity": "20000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "1",
+          "ArmyUnitRequirement": "1 Battalion",
+          "PersonnelRequiredForMissionCommand": "60",
+          "PersonnelRequiredForSecurity": "200",
+          "PersonnelRequiredForProcessingNCEs": "120",
+          "PersonnelRequiredForServices": "140",
+          "PersonnelRequiredForTransportationAndLogistics": "100",
+          "Notes": "Alternate node used to alleviate capacity concerns at RCs."
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              128.0986
+              35.1211
+            ],
+            [
+              128.0986
+              35.1211
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "TSH Japan",
+          "DwellTimeThresholdInDays": "30",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "100000",
+          "FullOperatingCapacity": "100000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "Unknown",
+          "PersonnelRequiredForMissionCommand": "Unknown",
+          "PersonnelRequiredForSecurity": "Unknown",
+          "PersonnelRequiredForProcessingNCEs": "Unknown",
+          "PersonnelRequiredForServices": "Unknown",
+          "PersonnelRequiredForTransportationAndLogistics": "Unknown",
+          "Notes": "Arbitrary node to represent all NCEs evacuated from Korea and diverted to their respective countries."
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              33.6116
+              130.3955
+            ],
+            [
+              33.6116
+              130.3955
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": "US EndPoint	NA",
+          "DwellTimeThresholdInDays": "N/A",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "500000",
+          "FullOperatingCapacity": "500000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "Unknown",
+          "PersonnelRequiredForMissionCommand": "Unknown",
+          "PersonnelRequiredForSecurity": "Unknown",
+          "PersonnelRequiredForProcessingNCEs": "Unknown",
+          "PersonnelRequiredForServices": "Unknown",
+          "PersonnelRequiredForTransportationAndLogistics": "Unknown",
+          "Notes": "Arbitrary to represent the arrival of USG Affiliated and AMCITS arriving to the US."
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              -122.3273
+              47.3128	
+            ],
+            [
+              -122.3273
+              47.3128
+            ]
+          ]
+        },
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "Nodes": " TCN EndPoint",
+          "DwellTimeThresholdInDays": "N/A",
+          "Category": "Primary",
+          "InitialOperatingCapacity": "500000",
+          "FullOperatingCapacity": "500000",
+          "InitialOperatingCapacityAchievedAtDay": "0",
+          "FullOperatingCapacityAchievedAtDay": "0",
+          "ArmyUnitRequirement": "Unknown",
+          "PersonnelRequiredForMissionCommand": "Unknown",
+          "PersonnelRequiredForSecurity": "Unknown",
+          "PersonnelRequiredForProcessingNCEs": "Unknown",
+          "PersonnelRequiredForServices": "Unknown",
+          "PersonnelRequiredForTransportationAndLogistics": "Unknown",
+          "Notes": "Arbitrary node to represent TCNs arriving to their respective countries."
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              121.0013
+              14.6347
+            ],
+            [
+              121.0013
+              14.6347
+            ]
+          ]
+        },
+      }
+    ]
+}
