@@ -14,7 +14,7 @@ def static_files(path):
 
 @app.route('/rail_network.geojson')
 def rail_network_geojson():
-    return send_from_directory(app.root_path, 'rail_network.geojson')
+    return send_from_directory(app.root_path, 'data/rail_network.geojson')
 
 @app.route('/api/updatePopulation', methods=['POST'])
 def update_population():
@@ -24,7 +24,7 @@ def update_population():
     new_population = data['newValue']
     
     # Update the database with the new population
-    conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
+    conn = sqlite3.connect(os.path.join(app.root_path, 'data/railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET current_pop = ? WHERE id = ?", (new_population, station_id))
     conn.commit()
