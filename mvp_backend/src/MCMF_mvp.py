@@ -1,7 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-
 import pandas as pd
+
+import visualize_graph as visualize
 
 def read_csv_and_create_graph(csv_file, G):
     """
@@ -51,7 +52,7 @@ nx.set_edge_attributes(G, 0, 'flow')
 min_cost_route = []
 
 for dest in destinations:
-    while evacuation_flow > 0:
+    if evacuation_flow > 0:
         # Find minimum cost route using Bellman-Ford algorithm
         min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
         current_min_cost_route = min_cost_length_and_routes[1][dest]
@@ -75,8 +76,19 @@ print(f"Total time: {total_time:.2f} units")
 print(f"Minimum cost route: {min_cost_route}")
 
 # Visualize the network graph (optional)
-pos = nx.spring_layout(G, seed=42)
-nx.draw(G, pos, with_labels=True, node_size=800, node_color='lightblue', font_size=10, font_color='black')
+node_colors = []
+
+# Assign colors to nodes based on whether they are source nodes or destination nodes
+for node in G.nodes():
+    if node == source:
+        node_colors.append('green')  # Color for source nodes
+    elif node in destinations:
+        node_colors.append('red')  # Color for destination nodes
+    else:
+        node_colors.append('lightblue')  # Default color
+
+pos = nx.kamada_kawai_layout(G)
+nx.draw(G, pos, with_labels=True, node_size=800, node_color=node_colors, font_size=10, font_color='black')
 labels = nx.get_edge_attributes(G, 'flow')
 nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 plt.title("Evacuation Network")
