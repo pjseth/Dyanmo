@@ -65,7 +65,7 @@ G = create_graph(nodes)
 
 # Choose the source node and one destination node for the demo
 source_node = 0
-destination_node = 13  # Example; choose based on your graph's destination nodes
+destination_node = 19  # Example
 
 # Calculate shortest path from source to destination
 path = nx.shortest_path(G, source=source_node, target=destination_node)
