@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.animation as ani
 import networkx as nx
 
 # Function to create a graph from the provided nodes and connections
@@ -60,4 +61,37 @@ nodes = {
 G = create_graph(nodes)
 
 # Draw the graph
-draw_graph(G)
+# draw_graph(G)
+
+# Choose the source node and one destination node for the demo
+source_node = 0
+destination_node = 13  # Example; choose based on your graph's destination nodes
+
+# Calculate shortest path from source to destination
+path = nx.shortest_path(G, source=source_node, target=destination_node)
+
+# Function to draw the initial graph
+def setup_graph(G):
+    pos = nx.get_node_attributes(G, 'pos')
+    colors = [node[1]['color'] for node in G.nodes(data=True)]
+    nx.draw(G, pos, with_labels=True, node_color=colors, node_size=500, font_size=8)
+    return pos
+
+# Set up the plot
+fig, ax = plt.subplots()
+pos = setup_graph(G)
+
+# Add a dot at the source node position
+dot, = plt.plot(pos[source_node][0], pos[source_node][1], 'go', markersize=10)  # 'go' for green dot
+
+def update(frame):
+    # Frame is the index of the current position in the path
+    if frame < len(path):
+        node = path[frame]
+        dot.set_data(pos[node][0], pos[node][1])
+    return dot,
+
+# Create animation
+animate = ani.FuncAnimation(fig, update, frames=range(len(path)), blit=True, repeat=False)
+
+plt.show()
