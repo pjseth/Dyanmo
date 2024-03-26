@@ -9,9 +9,9 @@ def create_graph(nodes):
     for node_id, node_info in nodes.items():
         node_type = node_info['type']
         if node_type == 's':
-            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='black')
+            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='#D4D4D4')
         elif node_type == 'd':
-            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='blue')
+            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='#ACCCE6')
         elif node_type == 'i':
             G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='white')
     
