@@ -51,6 +51,88 @@ def read_csv_and_create_graph(road_section_data, intersection_data, G):
 
     return G
 
+"""def find_next_available_vehicle(available_vehicles, vehicle_times):
+    min_completion_time = float('inf')
+    next_vehicle = None
+    for vehicle, time in vehicle_times.items():
+        if vehicle in available_vehicles and time < min_completion_time:
+            min_completion_time = time
+            next_vehicle = vehicle
+    return next_vehicle
+"""
+"""def optimize_evacuation_schedule(G, source, destinations, num_vehicles):
+    # Calculate travel time matrix
+    travel_times = dict(nx.all_pairs_dijkstra_path_length(G, weight='weight'))
+
+    # Initialize schedule for each vehicle
+    schedule = {f"Vehicle {i+1}": [] for i in range(num_vehicles)}
+
+    # Initialize priority queue of destinations based on total travel time
+    priority_queue = []
+    for dest in destinations:
+        total_travel_time = 0
+        for node in destinations:
+            if node in travel_times[source] and dest in travel_times[node]:
+                total_travel_time += travel_times[source][node] + travel_times[node][dest]
+        priority_queue.append((dest, total_travel_time))
+    priority_queue.sort(key=lambda x: x[1])
+
+    # Assign destinations to vehicles based on priority queue
+    while priority_queue:
+        for vehicle, _ in schedule.items():
+            if not priority_queue:
+                break
+            dest, _ = priority_queue.pop(0)
+            schedule[vehicle].append(dest)
+
+    return schedule"""
+"""
+def allocate_flow_to_destination(G, source, destination, evacuation_flow):
+    print(f"Evacuation flow before allocation for destination {dest}: {evacuation_flow}")
+
+    # Find minimum cost route using Bellman-Ford algorithm
+    min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
+    current_min_cost_route = min_cost_length_and_routes[1][dest]
+
+    # Augment flow along the minimum cost route
+    for i in range(len(current_min_cost_route) - 1):
+        node = current_min_cost_route[i]
+        next_node = current_min_cost_route[i + 1]
+        
+        # Check if the edge is a road section or intersection turning
+        if next_node not in destinations:
+            # Augment flow based on road section capacity
+            flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
+            G[node][next_node]['flow'] += flow_to_next_node
+        else:
+            # Find the intersection node
+            intersection_node = next_node
+            
+            # Determine the outgoing edge from the intersection
+            intersection_edges = list(G.out_edges(intersection_node))
+            out_edge = None
+            for edge in intersection_edges:
+                if edge[0] == node:
+                    out_edge = edge
+                    break
+            
+            # Augment flow based on intersection capacity
+            if out_edge:
+                flow_to_next_node = min(G[out_edge[0]][out_edge[1]]['capacity'], evacuation_flow)
+                G[out_edge[0]][out_edge[1]]['flow'] += flow_to_next_node
+            else:
+                # No valid out edge found, raise an error or handle the situation
+                pass
+
+        evacuation_flow -= flow_to_next_node
+        print(f"Evacuation flow after allocation for destination {dest}: {evacuation_flow}")
+    
+    return evacuation_flow
+"""
+
+
+
+
 # Create a sample network graph (you can replace this with your actual data)
 G = nx.DiGraph()
 
@@ -69,7 +151,11 @@ read_csv_and_create_graph(road_section_data, intersection_data, G)
 
 
 # Define the evacuation flow (you can adjust this based on your problem)
-evacuation_flow = 200
+evacuation_flow = start_flow = 400
+
+# Define the available vehicles (you can adjust this based on the problem)
+available_vehicles = 8
+
 
 # Initialize flow on each arc
 nx.set_edge_attributes(G, 0, 'flow')
@@ -77,54 +163,67 @@ nx.set_edge_attributes(G, 0, 'flow')
 # Initialize augmented route (minimum cost route)
 min_cost_route = []
 
-for dest in destinations:
-    if evacuation_flow > 0:
-        # Find minimum cost route using Bellman-Ford algorithm
-        min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
-        current_min_cost_route = min_cost_length_and_routes[1][dest]
+#schedule = optimize_evacuation_schedule(G, source, destinations, available_vehicles)
 
-        # Augment flow along the minimum cost route
-        for i in range(len(current_min_cost_route) - 1):
-            node = current_min_cost_route[i]
-            next_node = current_min_cost_route[i + 1]
+vehicle_times = {f"Vehicle {i+1}": 0 for i in range(available_vehicles)}
+
+while evacuation_flow > 0:
+    print(f"Evacuation flow before allocation: {evacuation_flow}")
+    # Find minimum cost route using Bellman-Ford algorithm
+    min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
+
+    # Find min cost destination
+    min_cost_destination = min(destinations, key=lambda dest: min_cost_length_and_routes[1][dest])
+    current_min_cost_route = min_cost_length_and_routes[1][min_cost_destination]
+    print(f"Min cost destination: {min_cost_destination}")
+
+
+
+    # Augment flow along the minimum cost route
+    for i in range(len(current_min_cost_route) - 1):
+        node = current_min_cost_route[i]
+        next_node = current_min_cost_route[i + 1]
+        
+        # Check if the edge is a road section or intersection turning
+        if next_node not in destinations:
+            # Augment flow based on road section capacity
+            flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
+            G[node][next_node]['flow'] += flow_to_next_node
+        else:
+            # Find the intersection node
+            intersection_node = next_node
             
-            # Check if the edge is a road section or intersection turning
-            if next_node not in destinations:
-                # Augment flow based on road section capacity
-                flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
-                G[node][next_node]['flow'] += flow_to_next_node
+            # Determine the outgoing edge from the intersection
+            intersection_edges = list(G.out_edges(intersection_node))
+            out_edge = None
+            for edge in intersection_edges:
+                if edge[0] == node:
+                    out_edge = edge
+                    break
+            
+            # Augment flow based on intersection capacity
+            if out_edge:
+                flow_to_next_node = min(G[out_edge[0]][out_edge[1]]['capacity'], evacuation_flow)
+                G[out_edge[0]][out_edge[1]]['flow'] += flow_to_next_node
             else:
-                # Find the intersection node
-                intersection_node = next_node
-                
-                # Determine the outgoing edge from the intersection
-                intersection_edges = list(G.out_edges(intersection_node))
-                out_edge = None
-                for edge in intersection_edges:
-                    if edge[0] == node:
-                        out_edge = edge
-                        break
-                
-                # Augment flow based on intersection capacity
-                if out_edge:
-                    flow_to_next_node = min(G[out_edge[0]][out_edge[1]]['capacity'], evacuation_flow)
-                    G[out_edge[0]][out_edge[1]]['flow'] += flow_to_next_node
-                else:
-                    # No valid out edge found, raise an error or handle the situation
-                    pass
+                # No valid out edge found, raise an error or handle the situation
+                pass
 
-            evacuation_flow -= flow_to_next_node
+        evacuation_flow -= flow_to_next_node
+    print(f"Evacuation flow after allocation: {evacuation_flow}")
 
 
-        # Update augmented route
-        min_cost_route += current_min_cost_route
+
+    """# Update augmented route
+    min_cost_route += current_min_cost_route"""
 
     # Calculate total time (sum of travel times along the augmented route)
-    total_time = sum(G[u][v]['flow'] * G[u][v]['weight'] for u, v in G.edges())
+total_time = sum(G[u][v]['flow'] * G[u][v]['weight'] for u, v in G.edges())
+
 
 print(f"Evacuation flow: {evacuation_flow} (remaining flow)")
 print(f"Total time: {total_time:.2f} units")
-print(f"Minimum cost route: {min_cost_route}")
+"""print(f"Minimum cost route: {min_cost_route}")"""
 
 # Visualize the network graph (optional)
 node_colors = []
