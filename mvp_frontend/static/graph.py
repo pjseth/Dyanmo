@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import networkx as nx
+import numpy as np
 
 # Function to create a graph from the provided nodes and connections
 def create_graph(nodes):
@@ -60,16 +61,6 @@ nodes = {
 # Create the graph
 G = create_graph(nodes)
 
-# Draw the graph
-# draw_graph(G)
-
-# Choose the source node and one destination node for the demo
-source_node = 0
-destination_node = 19  # Example
-
-# Calculate shortest path from source to destination
-path = nx.shortest_path(G, source=source_node, target=destination_node)
-
 # Function to draw the initial graph
 def setup_graph(G):
     pos = nx.get_node_attributes(G, 'pos')
@@ -81,17 +72,39 @@ def setup_graph(G):
 fig, ax = plt.subplots()
 pos = setup_graph(G)
 
-# Add a dot at the source node position
-dot, = plt.plot(pos[source_node][0], pos[source_node][1], 'go', markersize=10)  # 'go' for green dot
+# Choose the source node and one destination node for the demo
+source_node = 0
+destination_node = 19  # Example
 
-def update(frame):
-    # Frame is the index of the current position in the path
-    if frame < len(path):
-        node = path[frame]
-        dot.set_data(pos[node][0], pos[node][1])
+# Calculate shortest path from source to destination
+path = nx.shortest_path(G, source=source_node, target=destination_node)
+
+# Function to interpolate points between two nodes
+def interpolate_points(p1, p2, num_points=20):
+    return zip(np.linspace(p1[0], p2[0], num_points),
+               np.linspace(p1[1], p2[1], num_points))
+
+# Generate the full set of points for the animation
+points = []
+for i in range(len(path)-1):
+    start_pos = pos[path[i]]
+    end_pos = pos[path[i+1]]
+    points.extend(interpolate_points(start_pos, end_pos))
+
+dot, = plt.plot([], [], 'go', markersize=10)  # Initialize the dot
+
+def init():
+    dot.set_data([], [])
     return dot,
 
-# Create animation
-animate = ani.FuncAnimation(fig, update, frames=range(len(path)), blit=True, repeat=False)
+# Update function for the animation
+def update(frame):
+    if frame < len(points):
+        dot.set_data(points[frame])
+    return dot,
+
+# Create the animation
+ani = ani.FuncAnimation(fig, update, frames=range(len(points)), init_func=init,
+                        blit=True, repeat=False, interval=50)
 
 plt.show()
