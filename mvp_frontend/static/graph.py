@@ -75,36 +75,40 @@ pos = setup_graph(G)
 # Choose the source node and one destination node for the demo
 source_node = 0
 destination_node = 19  # Example
-
-# Calculate shortest path from source to destination
-path = nx.shortest_path(G, source=source_node, target=destination_node)
+paths = [[0, 6, 18], [0, 1, 9, 8, 16], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
 
 # Function to interpolate points between two nodes
 def interpolate_points(p1, p2, num_points=20):
     return zip(np.linspace(p1[0], p2[0], num_points),
                np.linspace(p1[1], p2[1], num_points))
 
-# Generate the full set of points for the animation
-points = []
-for i in range(len(path)-1):
-    start_pos = pos[path[i]]
-    end_pos = pos[path[i+1]]
-    points.extend(interpolate_points(start_pos, end_pos))
+# Generate points for each path
+all_points = []
+for path in paths:
+    points = []
+    for i in range(len(path) - 1):
+        start_pos = pos[path[i]]
+        end_pos = pos[path[i + 1]]
+        points.extend(interpolate_points(start_pos, end_pos))
+    all_points.append(points)
 
-dot, = plt.plot([], [], 'go', markersize=10)  # Initialize the dot
+dots = [plt.plot([], [], 'go', markersize=10)[0] for _ in range(len(paths))]  # Initialize the dots
 
 def init():
-    dot.set_data([], [])
-    return dot,
+    for dot in dots:
+        dot.set_data([], [])
+    return dots
 
 # Update function for the animation
 def update(frame):
-    if frame < len(points):
-        dot.set_data(points[frame])
-    return dot,
+    for i, dot in enumerate(dots):
+        points = all_points[i]
+        if frame < len(points):
+            dot.set_data(points[frame])
+    return dots
 
 # Create the animation
-ani = ani.FuncAnimation(fig, update, frames=range(len(points)), init_func=init,
+ani = ani.FuncAnimation(fig, update, frames=max(len(points) for points in all_points), init_func=init,
                         blit=True, repeat=False, interval=50)
 
 plt.show()

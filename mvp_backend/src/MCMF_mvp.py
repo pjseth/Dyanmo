@@ -96,8 +96,12 @@ def find_possible_destinations(destinations, min_cost_length_and_routes, G, evac
 
     return max_simultaneous_routes, evacuation_flow
 
-    
-# Create a sample network graph (you can replace this with your actual data)
+def add_unique_route(all_unique_routes, new_route):
+    new_tuple = tuple(new_route)
+    if new_tuple not in set(map(tuple, all_unique_routes)):
+        all_unique_routes.append(new_route)
+
+# Create a sample network graph (replace this with your actual data)
 G = nx.DiGraph()
 
 # Add nodes (replace with your actual node labels)
@@ -121,7 +125,7 @@ evacuation_flow = start_flow = 1000
 nx.set_edge_attributes(G, 0, 'flow')
 
 # Initialize augmented route (minimum cost route)
-min_cost_route = []
+unique_routes_taken = []
 total_time = 0
 
 print(f"Evacuation flow before allocation: {evacuation_flow}")
@@ -145,11 +149,14 @@ while evacuation_flow > 0:
     for edge in G.edges():
         G.edges[edge]['flow'] = 0
 
+    for route in simultaneous_routes:
+        add_unique_route(unique_routes_taken, route)
     print(f"Evacuation flow after allocation: {evacuation_flow}")
 
 
 print(f"Evacuation flow: {evacuation_flow} (remaining flow)")
 print(f"Total time: {total_time:.2f} units")
+print(unique_routes_taken)
 """print(f"Minimum cost route: {min_cost_route}")"""
 
 # Visualize the network graph (optional)
