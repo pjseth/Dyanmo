@@ -106,6 +106,6 @@ ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
 
 # Create the animation
 ani = ani.FuncAnimation(fig, update, frames=max(len(points) for points in all_points), init_func=init,
-                        blit=True, repeat=False, interval=50)
+                        blit=True, repeat=False, interval=80)
 
 plt.show()
