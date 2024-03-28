@@ -69,7 +69,7 @@ pos = setup_graph(G)
 # Choose the source node and one destination node for the demo
 source_node = 0
 destination_node = 19  # Example
-paths = [[0, 6, 18], [0, 1, 9, 8, 16], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
+paths = [[0, 6, 18], [0, 1, 9, 8, 14], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
 
 # Function to interpolate points between two nodes
 def interpolate_points(p1, p2, num_points=20):
