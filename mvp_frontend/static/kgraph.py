@@ -26,30 +26,31 @@ def create_graph(nodes):
     
     return G
 
-# Define nodes and their attributes with adjusted coordinates
 nodes = {
-    0: {'type': 's', 'x': 126.9730, 'y': 37.5665, 'connections': [1, 2]},
-    1: {'type': 'i', 'x': 126.9705, 'y': 37.5655, 'connections': [0, 4, 9]},
-    2: {'type': 'i', 'x': 126.9755, 'y': 37.5655, 'connections': [0, 3, 7, 11]},
-    3: {'type': 'i', 'x': 126.9775, 'y': 37.5665, 'connections': [2, 17, 19]},
-    4: {'type': 'i', 'x': 126.9690, 'y': 37.5650, 'connections': [1, 5, 16]},
-    5: {'type': 'i', 'x': 126.9690, 'y': 37.5640, 'connections': [4, 18]},
-    6: {'type': 'i', 'x': 126.9730, 'y': 37.5640, 'connections': [0, 7, 18]},
-    7: {'type': 'i', 'x': 126.9755, 'y': 37.5640, 'connections': [2, 6, 19, 20]},
-    8: {'type': 'i', 'x': 126.9675, 'y': 37.5670, 'connections': [9, 14, 16]},
-    9: {'type': 'i', 'x': 126.9705, 'y': 37.5670, 'connections': [1, 8, 10, 13]},
-    10: {'type': 'i', 'x': 126.9755, 'y': 37.5670, 'connections': [9, 11, 12]},
-    11: {'type': 'i', 'x': 126.9775, 'y': 37.5675, 'connections': [2, 10, 15]},
-    12: {'type': 'i', 'x': 126.9755, 'y': 37.5680, 'connections': [10, 13, 15]},
-    13: {'type': 'd', 'x': 126.9705, 'y': 37.5685, 'connections': [9, 12]},
-    14: {'type': 'd', 'x': 126.9675, 'y': 37.5680, 'connections': [8]},
-    15: {'type': 'd', 'x': 126.9775, 'y': 37.5680, 'connections': [11, 12]},
-    16: {'type': 'd', 'x': 126.9690, 'y': 37.5670, 'connections': [4, 8, 14]},
-    17: {'type': 'd', 'x': 126.9775, 'y': 37.5665, 'connections': [3]},
-    18: {'type': 'd', 'x': 126.9675, 'y': 37.5640, 'connections': [5, 6]},
-    19: {'type': 'd', 'x': 126.9775, 'y': 37.5640, 'connections': [3, 7]},
-    20: {'type': 'd', 'x': 126.9755, 'y': 37.5635, 'connections': [7]}
+    0: {'type': 's', 'x': 126.9731, 'y': 37.5664, 'connections': [1, 2]},
+    1: {'type': 'i', 'x': 126.9706, 'y': 37.5654, 'connections': [0, 4, 9]},
+    2: {'type': 'i', 'x': 126.9753, 'y': 37.5656, 'connections': [0, 3, 7, 11]},
+    3: {'type': 'i', 'x': 126.9774, 'y': 37.5664, 'connections': [2, 17, 19]},
+    4: {'type': 'i', 'x': 126.9691, 'y': 37.5651, 'connections': [1, 5, 16]},
+    5: {'type': 'i', 'x': 126.9691, 'y': 37.5641, 'connections': [4, 18]},
+    6: {'type': 'i', 'x': 126.9729, 'y': 37.5641, 'connections': [0, 7, 18]},
+    7: {'type': 'i', 'x': 126.9756, 'y': 37.5641, 'connections': [2, 6, 19]},
+    8: {'type': 'i', 'x': 126.9674, 'y': 37.5671, 'connections': [9, 14, 16]},
+    9: {'type': 'i', 'x': 126.9704, 'y': 37.5671, 'connections': [1, 8, 10, 13]},
+    10: {'type': 'i', 'x': 126.9756, 'y': 37.5671, 'connections': [9, 11, 12]},
+    11: {'type': 'i', 'x': 126.9774, 'y': 37.5676, 'connections': [2, 10, 15]},
+    12: {'type': 'i', 'x': 126.9755, 'y': 37.5681, 'connections': [10, 13, 15]},
+    13: {'type': 'd', 'x': 126.9706, 'y': 37.5686, 'connections': [9, 12]},
+    14: {'type': 'd', 'x': 126.9676, 'y': 37.5681, 'connections': [8]},
+    15: {'type': 'd', 'x': 126.9774, 'y': 37.5687, 'connections': [11, 12]},
+    16: {'type': 'd', 'x': 126.9691, 'y': 37.5671, 'connections': [4, 8, 14]},
+    17: {'type': 'd', 'x': 126.9774, 'y': 37.5664, 'connections': [3]},
+    18: {'type': 'd', 'x': 126.9676, 'y': 37.5641, 'connections': [5, 6]},
+    19: {'type': 'd', 'x': 126.9774, 'y': 37.5641, 'connections': [3, 7]},
 }
+
+
+
 
 # Create the graph
 G = create_graph(nodes)
