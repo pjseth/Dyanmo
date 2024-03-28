@@ -140,7 +140,7 @@ while evacuation_flow > 0:
     total_time += curr_time
 
     # Reset flows to 0 for all edges
-    if evacuation_flow == 0:
+    if evacuation_flow <= 0:
         break
     for edge in G.edges():
         G.edges[edge]['flow'] = 0
