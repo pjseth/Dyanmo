@@ -41,9 +41,9 @@ nodes = {
     11: {'type': 'i', 'x': 126.9774, 'y': 37.5676, 'connections': [2, 10, 15]},
     12: {'type': 'i', 'x': 126.9755, 'y': 37.5681, 'connections': [10, 13, 15]},
     13: {'type': 'd', 'x': 126.9706, 'y': 37.5686, 'connections': [9, 12]},
-    14: {'type': 'd', 'x': 126.9676, 'y': 37.5681, 'connections': [8]},
+    14: {'type': 'd', 'x': 126.9691, 'y': 37.5671, 'connections': [8]},
     15: {'type': 'd', 'x': 126.9774, 'y': 37.5687, 'connections': [11, 12]},
-    16: {'type': 'd', 'x': 126.9691, 'y': 37.5671, 'connections': [4, 8, 14]},
+    16: {'type': 'd', 'x': 126.9676, 'y': 37.5681, 'connections': [4, 8, 14]},
     17: {'type': 'd', 'x': 126.9774, 'y': 37.5664, 'connections': [3]},
     18: {'type': 'd', 'x': 126.9676, 'y': 37.5641, 'connections': [5, 6]},
     19: {'type': 'd', 'x': 126.9774, 'y': 37.5641, 'connections': [3, 7]},
@@ -69,7 +69,7 @@ pos = setup_graph(G)
 # Choose the source node and one destination node for the demo
 source_node = 0
 destination_node = 19  # Example
-paths = [[0, 6, 18], [0, 1, 9, 8, 14], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
+paths = [[0, 6, 18], [0, 1, 9, 8, 16], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
 
 # Function to interpolate points between two nodes
 def interpolate_points(p1, p2, num_points=20):
