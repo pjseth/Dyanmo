@@ -1,11 +1,14 @@
-from flask import Flask, render_template
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+
+from matplotlib.animation import HTMLWriter
+from flask import Flask, render_template_string
 import matplotlib.pyplot as plt
-import matplotlib.animation as ani
+import matplotlib.animation as animation
 import networkx as nx
 import numpy as np
 import contextily as ctx
-import tempfile
-import os
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -106,19 +109,50 @@ def update(frame):
 # Add Korean OpenStreetMap background
 ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
 
-# Create the animation
-ani = ani.FuncAnimation(fig, update, frames=max(len(points) for points in all_points), init_func=init,
-                        blit=True, repeat=False, interval=80)
+def save_animation_as_string(ani):
+    # Use BytesIO to capture the animation's HTML representation as binary data
+    animation_bytes_io = BytesIO()
+    # Save the animation to the BytesIO buffer with the HTMLWriter
+    ani.save(animation_bytes_io, writer=HTMLWriter())
+    # Seek to the start of the stream
+    animation_bytes_io.seek(0)
+    # Return the HTML content as a string
+    return animation_bytes_io.getvalue().decode('utf-8')
 
-# Save the animation as a temporary file in the static directory
-static_dir = os.path.join(app.root_path, 'static')
-os.makedirs(static_dir, exist_ok=True)
-animation_path = os.path.join(static_dir, 'animation.html')
-ani.save(animation_path, writer='html')
-
+# Updated Flask route to ensure thread-safe operations
 @app.route('/')
 def index():
-    return render_template('index.html', animation_path='/static/animation.html')
+    plt.close('all')  # Close any existing figures
+
+    fig, ax = plt.subplots()
+    pos = setup_graph(G)
+    ani = animation.FuncAnimation(fig, update, frames=max(len(points) for points in all_points),
+                                  init_func=init, blit=True, repeat=False, interval=80)
+
+    # Add contextily basemap to the axes
+    try:
+        ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
+    except Exception as e:
+        print(f"Could not add basemap: {e}")
+
+    # Convert the animation to JavaScript HTML format
+    animation_jshtml = ani.to_jshtml()
+
+    # Embed the animation HTML in your response
+    html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Path Animation</title>
+</head>
+<body>
+    <h1>Path Animation</h1>
+    {{ animation_jshtml|safe }}
+</body>
+</html>"""
+
+    # Pass the animation HTML to the template and render
+    return render_template_string(html_template, animation_jshtml=animation_jshtml)
 
 if __name__ == "__main__":
     app.run(debug=True)
