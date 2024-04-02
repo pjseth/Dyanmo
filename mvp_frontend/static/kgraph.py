@@ -1,8 +1,13 @@
+from flask import Flask, render_template
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import networkx as nx
 import numpy as np
 import contextily as ctx
+import tempfile
+import os
+
+app = Flask(__name__)
 
 # Function to create a graph from the provided nodes and connections
 def create_graph(nodes):
@@ -48,9 +53,6 @@ nodes = {
     18: {'type': 'd', 'x': 126.9676, 'y': 37.5641, 'connections': [5, 6]},
     19: {'type': 'd', 'x': 126.9774, 'y': 37.5641, 'connections': [3, 7]},
 }
-
-
-
 
 # Create the graph
 G = create_graph(nodes)
@@ -108,4 +110,15 @@ ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
 ani = ani.FuncAnimation(fig, update, frames=max(len(points) for points in all_points), init_func=init,
                         blit=True, repeat=False, interval=80)
 
-plt.show()
+# Save the animation as a temporary file in the static directory
+static_dir = os.path.join(app.root_path, 'static')
+os.makedirs(static_dir, exist_ok=True)
+animation_path = os.path.join(static_dir, 'animation.html')
+ani.save(animation_path, writer='html')
+
+@app.route('/')
+def index():
+    return render_template('index.html', animation_path='/static/animation.html')
+
+if __name__ == "__main__":
+    app.run(debug=True)
