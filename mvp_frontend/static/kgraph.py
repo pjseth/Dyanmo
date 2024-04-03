@@ -1,8 +1,16 @@
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+
+from matplotlib.animation import HTMLWriter
+from flask import Flask, render_template_string
 import matplotlib.pyplot as plt
-import matplotlib.animation as ani
+import matplotlib.animation as animation
 import networkx as nx
 import numpy as np
 import contextily as ctx
+from io import BytesIO
+
+app = Flask(__name__)
 
 # Function to create a graph from the provided nodes and connections
 def create_graph(nodes):
@@ -48,9 +56,6 @@ nodes = {
     18: {'type': 'd', 'x': 126.9676, 'y': 37.5641, 'connections': [5, 6]},
     19: {'type': 'd', 'x': 126.9774, 'y': 37.5641, 'connections': [3, 7]},
 }
-
-
-
 
 # Create the graph
 G = create_graph(nodes)
@@ -104,8 +109,83 @@ def update(frame):
 # Add Korean OpenStreetMap background
 ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
 
-# Create the animation
-ani = ani.FuncAnimation(fig, update, frames=max(len(points) for points in all_points), init_func=init,
-                        blit=True, repeat=False, interval=80)
+def save_animation_as_string(ani):
+    # Use BytesIO to capture the animation's HTML representation as binary data
+    animation_bytes_io = BytesIO()
+    # Save the animation to the BytesIO buffer with the HTMLWriter
+    ani.save(animation_bytes_io, writer=HTMLWriter())
+    # Seek to the start of the stream
+    animation_bytes_io.seek(0)
+    # Return the HTML content as a string
+    return animation_bytes_io.getvalue().decode('utf-8')
 
-plt.show()
+@app.route('/')
+def index():
+    plt.close('all')  # Close any existing figures to start fresh
+
+    fig, ax = plt.subplots(figsize=(10, 10))  # You can adjust the size as needed
+    G = create_graph(nodes)
+    pos = setup_graph(G)
+
+    # Add the basemap to the Axes instance
+    ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
+    
+    # Adjust the plot limits
+    min_x = min(node['x'] for node in nodes.values()) - 0.01
+    max_x = max(node['x'] for node in nodes.values()) + 0.01
+    min_y = min(node['y'] for node in nodes.values()) - 0.01
+    max_y = max(node['y'] for node in nodes.values()) + 0.01
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(min_y, max_y)
+    ax.axis('off')
+
+    # Initialize the dots within the route to ensure they are new for each request
+    dots = [ax.plot([], [], 'go', markersize=10)[0] for _ in paths]
+
+    # Update function for the animation
+    def update(frame):
+        for i, path in enumerate(paths):
+            if frame < len(all_points[i]):
+                x, y = all_points[i][frame]
+                dots[i].set_data(x, y)
+        return dots
+
+    # Function to interpolate points between two nodes
+    def interpolate_points(p1, p2, num_points=20):
+        return list(zip(np.linspace(p1[0], p2[0], num_points),
+                        np.linspace(p1[1], p2[1], num_points)))
+
+    # Generate points for each path
+    all_points = []
+    for path in paths:
+        points = []
+        for i in range(len(path) - 1):
+            start_pos = pos[path[i]]
+            end_pos = pos[path[i + 1]]
+            points += interpolate_points(start_pos, end_pos)
+        all_points.append(points)
+
+    # Create the animation
+    ani = animation.FuncAnimation(fig, update, frames=max(len(p) for p in all_points), 
+                                  init_func=lambda: dots, repeat=False, interval=100)
+
+    # Convert the animation to JavaScript HTML format
+    animation_jshtml = ani.to_jshtml()
+
+    # Embed the animation HTML in your response
+    html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Path Animation</title>
+</head>
+<body>
+    <h1>Path Animation</h1>
+    {{ animation_jshtml|safe }}
+</body>
+</html>"""
+
+    return render_template_string(html_template, animation_jshtml=animation_jshtml)
+
+if __name__ == '__main__':
+    app.run(debug=True)
