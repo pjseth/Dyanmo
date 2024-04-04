@@ -101,79 +101,82 @@ def add_unique_route(all_unique_routes, new_route):
     if new_tuple not in set(map(tuple, all_unique_routes)):
         all_unique_routes.append(new_route)
 
-# Create a sample network graph (replace this with your actual data)
-G = nx.DiGraph()
+def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
+    # Create a sample network graph 
+    G = nx.DiGraph()
 
-# Add nodes (replace with your actual node labels)
-G.add_nodes_from(['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19','20'])
-source = '0'
-destinations = ['13','14','15','16','17','18','19','20']
+    # Add nodes 
+    G.add_nodes_from(['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19','20'])
+    source = '0'
+    destinations = ['13','14','15','16','17','18','19','20']
 
-# Add arcs (replace with your actual arc information)
-road_section_data = "../data/road_section_data.csv"
+    # Add arcs (replace with your actual arc information)
+    road_section_data = "../backend/data/road_section_data.csv"
 
-# Add intersection (replace with actual intersection information)
-intersection_data = "../data/intersection_capacity.csv"
+    # Add intersection (replace with actual intersection information)
+    intersection_data = "../backend/data/intersection_capacity.csv"
 
-intersections = read_csv_and_create_graph(road_section_data, intersection_data, G)
-
-
-# Define the evacuation flow (you can adjust this based on your problem)
-evacuation_flow = start_flow = 1000
-
-# Initialize flow on each arc
-nx.set_edge_attributes(G, 0, 'flow')
-
-# Initialize augmented route (minimum cost route)
-unique_routes_taken = []
-total_time = 0
-
-print(f"Evacuation flow before allocation: {evacuation_flow}")
-# Find minimum cost route using Bellman-Ford algorithm
-min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
+    intersections = read_csv_and_create_graph(road_section_data, intersection_data, G)
 
 
+    # Define the evacuation flow (you can adjust this based on your problem)
+    evacuation_flow = start_flow = total_evacuation_flow
 
-while evacuation_flow > 0:
-    # calculate total time passed for simultaneous routes
-    # Find all possible min cost destination that can happen simultaneously and augment flow
-    simultaneous_routes, evacuation_flow = find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow)
-    curr_time = 0
-    for route in simultaneous_routes:
-        curr_time = max(curr_time, calculate_total_time(G, route, intersections))
-    total_time += curr_time
+    # Initialize flow on each arc
+    nx.set_edge_attributes(G, 0, 'flow')
 
-    # Reset flows to 0 for all edges
-    if evacuation_flow <= 0:
-        break
-    for edge in G.edges():
-        G.edges[edge]['flow'] = 0
+    # Initialize augmented route (minimum cost route)
+    unique_routes_taken = []
+    total_time = 0
 
-    for route in simultaneous_routes:
-        add_unique_route(unique_routes_taken, route)
-    print(f"Evacuation flow after allocation: {evacuation_flow}")
+    # print(f"Evacuation flow before allocation: {evacuation_flow}")
+    # Find minimum cost route using Bellman-Ford algorithm
+    min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
 
 
-print(f"Evacuation flow: {evacuation_flow} (remaining flow)")
-print(f"Total time: {total_time:.2f} units")
-print(unique_routes_taken)
-"""print(f"Minimum cost route: {min_cost_route}")"""
 
-# Visualize the network graph (optional)
-node_colors = []
+    while evacuation_flow > 0:
+        # calculate total time passed for simultaneous routes
+        # Find all possible min cost destination that can happen simultaneously and augment flow
+        simultaneous_routes, evacuation_flow = find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow)
+        curr_time = 0
+        for route in simultaneous_routes:
+            curr_time = max(curr_time, calculate_total_time(G, route, intersections))
+        total_time += curr_time
 
-# Assign colors to nodes based on whether they are source nodes or destination nodes
-for node in G.nodes():
-    if node == source:
-        node_colors.append('green')  # Color for source nodes
-    elif node in destinations:
-        node_colors.append('red')  # Color for destination nodes
-    else:
-        node_colors.append('lightblue')  # Default color
+        # Reset flows to 0 for all edges
+        if evacuation_flow <= 0:
+            break
+        for edge in G.edges():
+            G.edges[edge]['flow'] = 0
 
-pos = nx.kamada_kawai_layout(G)
-nx.draw(G, pos, with_labels=True, node_size=800, node_color=node_colors, font_size=10, font_color='black')
-labels = nx.get_edge_attributes(G, 'flow')
-nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-plt.title("Evacuation Network")
-plt.show()
+        for route in simultaneous_routes:
+            add_unique_route(unique_routes_taken, route)
+        print(f"Evacuation flow after allocation: {evacuation_flow}")
+
+
+    # print(f"Evacuation flow: {evacuation_flow} (remaining flow)")
+    # print(f"Total time: {total_time:.2f} units")
+    # print(unique_routes_taken)
+
+    return {'unique_routes_taken': unique_routes_taken, 'total_time': total_time}
+    # """print(f"Minimum cost route: {min_cost_route}")"""
+
+    # # Visualize the network graph (optional)
+    # node_colors = []
+
+    # # Assign colors to nodes based on whether they are source nodes or destination nodes
+    # for node in G.nodes():
+    #     if node == source:
+    #         node_colors.append('green')  # Color for source nodes
+    #     elif node in destinations:
+    #         node_colors.append('red')  # Color for destination nodes
+    #     else:
+    #         node_colors.append('lightblue')  # Default color
+
+    # pos = nx.kamada_kawai_layout(G)
+    # nx.draw(G, pos, with_labels=True, node_size=800, node_color=node_colors, font_size=10, font_color='black')
+    # labels = nx.get_edge_attributes(G, 'flow')
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+    # plt.title("Evacuation Network")
+    # plt.show()

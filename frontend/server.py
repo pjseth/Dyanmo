@@ -1,4 +1,9 @@
+import sys
+mcmf_dir = '../backend/src'
+sys.path.append(mcmf_dir)
+
 from flask import Flask, jsonify, send_from_directory, request
+from MCMF_mvp import run_algorithm_with_evacuation_flow
 import sqlite3
 import os
 
@@ -15,6 +20,19 @@ def static_files(path):
 @app.route('/rail_network.geojson')
 def rail_network_geojson():
     return send_from_directory(app.root_path, 'rail_network.geojson')
+
+# Route to handle the request from frontend to run the algorithm
+@app.route('/api/evacuation', methods=['POST'])
+def evacuate():
+    # Get data from the request
+    data = request.json
+    total_evacuation_flow = data['total_evacuation_flow']
+
+    # Call the function to run the evacuation algorithm
+    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow)
+
+    # Return the result as JSON
+    return jsonify(result)
 
 @app.route('/api/updatePopulation', methods=['POST'])
 def update_population():
