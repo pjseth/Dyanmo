@@ -1,0 +1,24 @@
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+#evacuation-time-box {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Ensures it stays on top of other map layers */
+}
+
+#evacuation-time {
+    font-weight: bold;
+}
