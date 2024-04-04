@@ -42,4 +42,4 @@ class Graph {
 }
 
 // Export the Graph class for use in other scripts
-export { Graph };
+module.exports = Graph;
