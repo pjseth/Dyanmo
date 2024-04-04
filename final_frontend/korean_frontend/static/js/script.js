@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([37.5665, 126.9780], 10);
+var map = L.map('map').setView([37.5665, 126.9780], 16);
 
 // Load and display OSM tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -42,6 +42,21 @@ function handleRailLines(feature, layer) {
 // Function to handle stations
 function handleStations(feature, latlng) {
     if (feature.properties) {
+        let markerColor;
+        switch (feature.properties.color) {
+            case 1:
+                markerColor = '#FF0000'; // Red for 's'
+                break;
+            case 2:
+                markerColor = '#000000'; // Black for 'i'
+                break;
+            case 3:
+                markerColor = '#0000FF'; // Blue for 'd'
+                break;
+            default:
+                markerColor = '#000000'; // Default to black
+        }
+        
         let popupContent = `
             <strong>${getEnglishName(feature.properties)}</strong><br>
             Current Population: <span id="population-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
@@ -61,7 +76,8 @@ function handleStations(feature, latlng) {
             <button onclick="updateValue('${feature.id}', 'transport')">
             Update Transport Method</button>
             `;
-        return L.marker(latlng).bindPopup(popupContent);
+
+        return L.circleMarker(latlng, { color: markerColor }).bindPopup(popupContent);
     }
 }
 
@@ -97,7 +113,8 @@ function updateValue(stationId, type) {
                     document.getElementById(`personnelPresent-${stationId}`).textContent = newValue;
                 } else if (type === 'transport') {
                     capacityData[stationId].transport = newValue;
-                    document.getElementById(`transport-${stationId}`).textContent = newValue;
+                    document
+                    .getElementById(`transport-${stationId}`).textContent = newValue;
                 }
             })
             .catch((error) => {
@@ -108,45 +125,132 @@ function updateValue(stationId, type) {
     }
 }
 
-// Fetch capacities from the backend API
-fetch('/api/capacities')
-    .then(response => response.json())
-    .then(data => {
-        // Store capacity data
-        capacityData = data;
+// Define the nodes with coordinates and connections
+const nodes = {
+    0: { x: 126.9731, y: 37.5664, color: 1, connections: [1, 2] },
+    1: { x: 126.9706, y: 37.5654, color: 2, connections: [0, 4, 9] },
+    2: { x: 126.9753, y: 37.5656, color: 2, connections: [0, 3, 7, 11] },
+    3: { x: 126.9774, y: 37.5664, color: 2, connections: [2, 17, 19] },
+    4: { x: 126.9691, y: 37.5651, color: 2, connections: [1, 5, 16] },
+    5: { x: 126.9691, y: 37.5641, color: 2, connections: [4, 18] },
+    6: { x: 126.9729, y: 37.5641, color: 2, connections: [0, 7, 18] },
+    7: { x: 126.9756, y: 37.5641, color: 2, connections: [2, 6, 19] },
+    8: { x: 126.9675, y: 37.5665, color: 2, connections: [9, 14, 16] },
+    9: { x: 126.9704, y: 37.5671, color: 2, connections: [1, 8, 10, 13] },
+    10: { x: 126.9756, y: 37.5671, color: 2, connections: [9, 11, 12] },
+    11: { x: 126.9774, y: 37.5676, color: 2, connections: [2, 10, 15] },
+    12: { x: 126.9755, y: 37.5681, color: 2, connections: [10, 13, 15] },
+    13: { x: 126.9706, y: 37.5686, color: 3, connections: [9, 12] },
+    14: { x: 126.9691, y: 37.5682, color: 3, connections: [8] },
+    15: { x: 126.9774, y: 37.5687, color: 3, connections: [11, 12] },
+    16: { x: 126.9676, y: 37.5681, color: 3, connections: [4, 8, 14] },
+    17: { x: 126.9774, y: 37.5664, color: 3, connections: [3] },
+    18: { x: 126.9676, y: 37.5641, color: 3, connections: [5, 6] },
+    19: { x: 126.9774, y: 37.5641, color: 3, connections: [3, 7] },
+};
 
-        // Then load the GeoJSON data
-        fetch('/rail_network.geojson')
-            .then(response => response.json())
-            .then(data => {
-                L.geoJSON(data, {
-                    onEachFeature: handleRailLines,
-                    pointToLayer: handleStations
-                }).addTo(map);
+// Initialize the GeoJSON object
+const geojson = {
+    "type": "FeatureCollection",
+    "features": []
+};
 
-                // Connect nodes based on their connections
-                connectNodes(nodes);
-            })
-            .catch(error => console.error('Error loading GeoJSON:', error));
-    })
-    .catch(error => console.error('Error fetching capacities:', error));
+// Define marker colors for each type
+const markerColors = {
+    's': '#000000', // Black for 's'
+    'i': '#FF0000', // Red for 'i'
+    'd': '#0000FF'  // Blue for 'd'
+};
 
-// Function to connect nodes based on their connections
-function connectNodes(nodes) {
-    for (const nodeId in nodes) {
-        const node = nodes[nodeId];
-        const { x: x1, y: y1 } = node;
-        const latLng1 = L.latLng(y1, x1);
-
-        for (const connectedNodeId of node.connections) {
-            const connectedNode = nodes[connectedNodeId];
-            const { x: x2, y: y2 } = connectedNode;
-            const latLng2 = L.latLng(y2, x2);
-
-            L.polyline([latLng1, latLng2], { color: 'blue' }).addTo(map);
+// Add features for each node
+for (const nodeId in nodes) {
+    const node = nodes[nodeId];
+    const feature = {
+        "type": "Feature",
+        "properties": {
+            "type": "node",
+            "name": nodeId,
+            "color": node.color
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [node.x, node.y]
         }
+    };
+    geojson.features.push(feature);
+}
+
+// Add connecting lines
+for (const nodeId in nodes) {
+    const node = nodes[nodeId];
+    for (const connectedNodeId of node.connections) {
+        const line = {
+            "type": "Feature",
+            "properties": {
+                "type": "line",
+                "name": "connect"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [node.x, node.y],
+                    [nodes[connectedNodeId].x, nodes[connectedNodeId].y]
+                ]
+            }
+        };
+        geojson.features.push(line);
     }
 }
 
+// Use the generated GeoJSON object directly
+L.geoJSON(geojson, {
+    onEachFeature: handleRailLines,
+    pointToLayer: handleStations
+}).addTo(map);
 
+// Initialize evacuation time
 var evacuationTime = 50; // Initial evacuation time in minutes, adjust as needed
+
+// Define multiple paths
+var paths = [
+    [0, 6, 18],
+    [0, 1, 9, 8, 16],
+    [0, 1, 9, 13],
+    [0, 2, 3, 17],
+    [0, 2, 3, 19]
+];
+
+// Array to hold animated markers for each path
+var animatedMarkers = [];
+
+// Function to animate a marker along a path
+function animateMarker(marker, path) {
+    var index = 1; // Start from the second node to avoid adding a green dot at the source node
+    var length = path.length;
+
+    function moveMarker() {
+        if (index < length) {
+            var node = nodes[path[index]];
+            var latLng = L.latLng(node.y, node.x);
+            marker.setLatLng(latLng);
+            index++;
+        } else {
+            clearInterval(marker.interval);
+        }
+    }
+
+    marker.interval = setInterval(moveMarker, 1000); // Increase the interval for smoother animation
+}
+
+// Function to create and animate markers for each path
+function animatePaths() {
+    paths.forEach(function(path) {
+        var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], { color: 'red', fillColor: 'red', fillOpacity: 1, radius: 5 }).addTo(map);
+        animatedMarkers.push(marker);
+        animateMarker(marker, path);
+    });
+}
+
+// Call the function to start animating paths
+animatePaths();
+
