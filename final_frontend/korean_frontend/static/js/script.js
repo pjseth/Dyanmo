@@ -14,30 +14,7 @@ function getEnglishName(properties) {
 // Global object to hold capacity data
 var capacityData = {};
 
-// Function to handle rail lines
-function handleRailLines(feature, layer) {
-    if (feature.properties) {
-        let popupContent = `
-            <strong>${getEnglishName(feature.properties)}</strong><br>
-            Current Population: <span id="population-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
-            <input type="number" id="new-population-${feature.id}" placeholder="Enter new population">
-            <button onclick="updateValue('${feature.id}', 'population')">Update Population Value</button><br>
-            Max Capacity: <span id="capacity-${feature.id}">${capacityData[feature.id]?.max_capacity || 'N/A'}</span><br>
-            <input type="number" id="new-capacity-${feature.id}" placeholder="Enter new max capacity">
-            <button onclick="updateValue('${feature.id}', 'capacity')">Update Max Capacity</button><br>
-            Personnel Needed: <span id="personnelNeeded-${feature.id}">${capacityData[feature.id]?.personnel_needed || 'N/A'}</span><br>
-            <input type="number" id="new-personnelNeeded-${feature.id}" placeholder="Enter personnel needed">
-            <button onclick="updateValue('${feature.id}', 'personnelNeeded')">Update Personnel Needed</button><br>
-            Personnel Present: <span id="personnelPresent-${feature.id}">${capacityData[feature.id]?.personnel_present || 'N/A'}</span><br>
-            <input type="number" id="new-personnelPresent-${feature.id}" placeholder="Enter personnel present">
-            <button onclick="updateValue('${feature.id}', 'personnelPresent')">Update Personnel Present</button><br>
-            Transport Methods: <span id="transport-${feature.id}">${capacityData[feature.id]?.transport || 'N/A'}</span><br>
-            <input type="number" id="new-transport-${feature.id}" placeholder="Enter new transport">
-            <button onclick="updateValue('${feature.id}', 'transport')">Update Transport Method</button>
-        `;
-        layer.bindPopup(popupContent);
-    }
-}
+
 
 // Function to handle stations
 function handleStations(feature, latlng) {
@@ -59,22 +36,9 @@ function handleStations(feature, latlng) {
         
         let popupContent = `
             <strong>${getEnglishName(feature.properties)}</strong><br>
-            Current Population: <span id="population-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
-            <input type="number" id="new-population-${feature.id}" placeholder="Enter new population">
-            <button onclick="updateValue('${feature.id}', 'population')">Update Population Value</button><br>
-            Max Capacity: <span id="capacity-${feature.id}">${capacityData[feature.id]?.max_capacity || 'N/A'}</span><br>
-            <input type="number" id="new-capacity-${feature.id}" placeholder="Enter new max capacity">
-            <button onclick="updateValue('${feature.id}', 'capacity')">Update Max Capacity</button><br>
-            Personnel Needed: <span id="personnelNeeded-${feature.id}">${capacityData[feature.id]?.personnel_needed || 'N/A'}</span><br>
-            <input type="number" id="new-personnelNeeded-${feature.id}" placeholder="Enter personnel needed">
-            <button onclick="updateValue('${feature.id}', 'personnelNeeded')">Update Personnel Needed</button><br>
-            Personnel Present: <span id="personnelPresent-${feature.id}">${capacityData[feature.id]?.personnel_present || 'N/A'}</span><br>
-            <input type="number" id="new-personnelPresent-${feature.id}" placeholder="Enter personnel present">
-            <button onclick="updateValue('${feature.id}', 'personnelPresent')">Update Personnel Present</button><br>
-            Transport Methods: <span id="transport-${feature.id}">${capacityData[feature.id]?.transport || 'N/A'}</span><br>
-            <input type="number" id="new-transport-${feature.id}" placeholder="Enter new transport">
-            <button onclick="updateValue('${feature.id}', 'transport')">
-            Update Transport Method</button>
+            Total Evacuation Vehicle Number: <span id="vehicle-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
+            <input type="number" id="vehicle-number-${feature.id}" placeholder="Enter Number">
+            <button onclick="updateValue('${feature.id}', 'vehicle')">Update Vehicle Number</button><br>
             `;
 
         return L.circleMarker(latlng, { color: markerColor }).bindPopup(popupContent);
@@ -204,7 +168,6 @@ for (const nodeId in nodes) {
 
 // Use the generated GeoJSON object directly
 L.geoJSON(geojson, {
-    onEachFeature: handleRailLines,
     pointToLayer: handleStations
 }).addTo(map);
 
