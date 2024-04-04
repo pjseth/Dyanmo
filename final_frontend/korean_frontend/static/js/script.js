@@ -225,22 +225,44 @@ var animatedMarkers = [];
 
 // Function to animate a marker along a path
 function animateMarker(marker, path) {
-    var index = 1; // Start from the second node to avoid adding a green dot at the source node
+    var index = 0; // Start from the source node
     var length = path.length;
+    var duration = 4000; // Duration of animation in milliseconds
+    var startTime; // Variable to store the start time of the animation
 
     function moveMarker() {
-        if (index < length) {
+        if (index < length - 1) {
             var node = nodes[path[index]];
-            var latLng = L.latLng(node.y, node.x);
-            marker.setLatLng(latLng);
-            index++;
+            var nextNode = nodes[path[index + 1]];
+            if (nextNode) {
+                if (!startTime) {
+                    startTime = new Date().getTime();
+                }
+                var currentTime = new Date().getTime();
+                var elapsedTime = currentTime - startTime;
+                var fraction = elapsedTime / duration;
+                if (fraction < 1) {
+                    var interpolatedLatLng = L.latLng(
+                        node.y + fraction * (nextNode.y - node.y),
+                        node.x + fraction * (nextNode.x - node.x)
+                    );
+                    marker.setLatLng(interpolatedLatLng);
+                } else {
+                    index++;
+                    startTime = null;
+                }
+            } else {
+                clearInterval(marker.interval);
+            }
         } else {
             clearInterval(marker.interval);
         }
     }
 
-    marker.interval = setInterval(moveMarker, 1000); // Increase the interval for smoother animation
+    marker.interval = setInterval(moveMarker, 20); // Interval for smoother animation
 }
+
+
 
 // Function to create and animate markers for each path
 function animatePaths() {

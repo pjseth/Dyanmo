@@ -1,37 +1,39 @@
+from io import BytesIO
+import contextily as ctx
+import numpy as np
+import networkx as nx
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+from flask import Flask, render_template_string
+from matplotlib.animation import HTMLWriter
 import matplotlib
 matplotlib.use('Agg')  # Use a non-GUI backend
-
-from matplotlib.animation import HTMLWriter
-from flask import Flask, render_template_string
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import networkx as nx
-import numpy as np
-import contextily as ctx
-from io import BytesIO
 
 app = Flask(__name__)
 
 # Function to create a graph from the provided nodes and connections
 def create_graph(nodes):
     G = nx.Graph()
-    
+
     # Add nodes with their coordinates
     for node_id, node_info in nodes.items():
         node_type = node_info['type']
         if node_type == 's':
-            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='#D4D4D4')
+            G.add_node(node_id, pos=(
+                node_info['x'], node_info['y']), color='#D4D4D4')
         elif node_type == 'd':
-            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='#ACCCE6')
+            G.add_node(node_id, pos=(
+                node_info['x'], node_info['y']), color='#ACCCE6')
         elif node_type == 'i':
-            G.add_node(node_id, pos=(node_info['x'], node_info['y']), color='white')
-    
+            G.add_node(node_id, pos=(
+                node_info['x'], node_info['y']), color='white')
+
     # Add edges
     for node_id, node_info in nodes.items():
         connections = node_info['connections']
         for connection in connections:
             G.add_edge(node_id, connection)
-    
+
     return G
 
 nodes = {
@@ -64,7 +66,8 @@ G = create_graph(nodes)
 def setup_graph(G):
     pos = nx.get_node_attributes(G, 'pos')
     colors = [node[1]['color'] for node in G.nodes(data=True)]
-    nx.draw(G, pos, with_labels=True, node_color=colors, node_size=500, font_size=8)
+    nx.draw(G, pos, with_labels=True, node_color=colors,
+            node_size=500, font_size=8)
     return pos
 
 # Set up the plot
@@ -74,24 +77,8 @@ pos = setup_graph(G)
 # Choose the source node and one destination node for the demo
 source_node = 0
 destination_node = 19  # Example
-paths = [[0, 6, 18], [0, 1, 9, 8, 16], [0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
-
-# Function to interpolate points between two nodes
-def interpolate_points(p1, p2, num_points=20):
-    return zip(np.linspace(p1[0], p2[0], num_points),
-               np.linspace(p1[1], p2[1], num_points))
-
-# Generate points for each path
-all_points = []
-for path in paths:
-    points = []
-    for i in range(len(path) - 1):
-        start_pos = pos[path[i]]
-        end_pos = pos[path[i + 1]]
-        points.extend(interpolate_points(start_pos, end_pos))
-    all_points.append(points)
-
-dots = [plt.plot([], [], 'go', markersize=10)[0] for _ in range(len(paths))]  # Initialize the dots
+paths = [[0, 6, 18], [0, 1, 9, 8, 16], [
+    0, 1, 9, 13], [0, 2, 3, 17], [0, 2, 3, 19]]
 
 def init():
     for dot in dots:
@@ -123,13 +110,15 @@ def save_animation_as_string(ani):
 def index():
     plt.close('all')  # Close any existing figures to start fresh
 
-    fig, ax = plt.subplots(figsize=(10, 10))  # You can adjust the size as needed
+    # You can adjust the size as needed
+    fig, ax = plt.subplots(figsize=(10, 10))  # Width and height in inches
     G = create_graph(nodes)
     pos = setup_graph(G)
 
     # Add the basemap to the Axes instance
-    ctx.add_basemap(ax, crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
-    
+    ctx.add_basemap(ax, crs='EPSG:4326',
+                    source=ctx.providers.OpenStreetMap.Mapnik)
+
     # Adjust the plot limits
     min_x = min(node['x'] for node in nodes.values()) - 0.01
     max_x = max(node['x'] for node in nodes.values()) + 0.01
@@ -144,10 +133,13 @@ def index():
 
     # Update function for the animation
     def update(frame):
-        for i, path in enumerate(paths):
-            if frame < len(all_points[i]):
-                x, y = all_points[i][frame]
-                dots[i].set_data(x, y)
+        for i, dot in enumerate(dots):
+            points = all_points[i]
+            if frame < len(points):
+                dot.set_data(points[frame])
+            else:
+                # If the frame exceeds the number of points for this path, hide the dot
+                dot.set_data([], [])
         return dots
 
     # Function to interpolate points between two nodes
@@ -162,26 +154,72 @@ def index():
         for i in range(len(path) - 1):
             start_pos = pos[path[i]]
             end_pos = pos[path[i + 1]]
+            # Include the endpoint (end_pos) in the interpolation
             points += interpolate_points(start_pos, end_pos)
+        # Add the last point (the node position) to each path
+        points.append(end_pos)
         all_points.append(points)
 
     # Create the animation
-    ani = animation.FuncAnimation(fig, update, frames=max(len(p) for p in all_points), 
+    ani = animation.FuncAnimation(fig, update, frames=max(len(p) for p in all_points),
                                   init_func=lambda: dots, repeat=False, interval=100)
 
     # Convert the animation to JavaScript HTML format
     animation_jshtml = ani.to_jshtml()
 
+    # CSS to make the map take full width and reduce white space
+    custom_css = """
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #animation_container {
+            width: 90%;
+            height: auto;
+            margin: auto;
+        }
+        .mpl-container {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+    """
+
     # Embed the animation HTML in your response
-    html_template = """
+    html_template = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Path Animation</title>
+    {custom_css}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Path Animation</h1>
-    {{ animation_jshtml|safe }}
+    <h1>Interactive OpenStreetMap</h1>
+    <div id="map"></div>
+    <div id="animation_container">
+        {animation_jshtml}
+    </div>
+    <script>
+        var map = L.map('map').setView([37.5664, 126.9731], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+    </script>
 </body>
 </html>"""
 
