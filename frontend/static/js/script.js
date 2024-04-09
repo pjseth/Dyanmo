@@ -152,7 +152,7 @@ function initiateEvacuation(totalEvacuationFlow) {
         // Update paths array with unique routes taken
         paths = data.unique_routes_taken;
         // Update evacuation time with total time
-        evacuation_time = data.total_time;
+        evacuation_time = data.total_time.toFixed(2);
         document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`; 
         // Call function to update markers on the map or perform any other actions
         updateMarkersOnMap();
@@ -326,14 +326,30 @@ function animateMarker(marker, path) {
     marker.interval = setInterval(moveMarker, 20); // Interval for smoother animation
 }
 
+// Add CSS for animated markers to display on top
+var animatedMarkerStyle = document.createElement('style');
+animatedMarkerStyle.type = 'text/css';
+animatedMarkerStyle.innerHTML = `
+    .animated-marker {
+        z-index: 4000; /* Set a high z-index value to ensure it appears above other elements */
+    }
+`;
+document.head.appendChild(animatedMarkerStyle);
+
 
 // Function to create and animate markers for each path
 function animatePaths() {
-    paths.forEach(function(path) {
-        var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], { color: 'red', fillColor: 'red', fillOpacity: 2, radius: 5 }).addTo(map);
-        animatedMarkers.push(marker);
-        animateMarker(marker, path);
-    });
+    paths.forEach(function(path) {
+        var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], { 
+            color: 'red', 
+            fillColor: 'red', 
+            fillOpacity: 2, 
+            radius: 5,
+            className: 'animated-marker' // Add class to apply style
+        }).addTo(map);
+        animatedMarkers.push(marker);
+        animateMarker(marker, path);
+    });
 }
 
 // Call the function to start animating paths
