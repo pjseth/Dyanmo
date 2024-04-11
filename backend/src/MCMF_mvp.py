@@ -51,7 +51,7 @@ def calculate_total_time(G, path, intersections):
         total_time += intersections[(start_node, intersection_node, end_node)]['delay']
     
     total_time += G[path[-2]][path[-1]]['weight']
-    print(total_time)
+    # print(total_time)
     return total_time
 
 def find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow):
@@ -65,6 +65,7 @@ def find_possible_destinations(destinations, min_cost_length_and_routes, G, evac
 
     for node, route in filtered_routes.items():
         simultaneous_routes_count = 0
+        routes_with_flow = []  # List to store routes with flow on edges
         
         # Iterate over the edges in the route
         update_route = True
@@ -76,30 +77,32 @@ def find_possible_destinations(destinations, min_cost_length_and_routes, G, evac
             # Check if the current edge exists in the graph and has enough capacity
             if G[node][next_node]['flow'] <= G[node][next_node]['capacity']:
                 flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
+                routes_with_flow.append((node, next_node, flow_to_next_node))  # Store edge with flow
             else:
                 # If any edge in the route doesn't have enough capacity, break the loop
                 update_route = False
+                break
         
         # augment flow along the minimum cost route
         if update_route:
-            print("here")
-            flow_to_next_node = np.inf
             simultaneous_routes_count += 1
-            for i in range(len(route) - 1):
-                node = route[i]
-                next_node = route[i+1]
-                flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
+            flows = []
+            for edge in routes_with_flow:
+                node, next_node, flow_to_next_node = edge
                 G[node][next_node]['flow'] += flow_to_next_node
+                flows.append(flow_to_next_node)
             
             evacuation_flow -= flow_to_next_node
-            max_simultaneous_routes.append(route)
+            max_simultaneous_routes.append((route, flows))  # Store route with flow on edges
 
     return max_simultaneous_routes, evacuation_flow
 
-def add_unique_route(all_unique_routes, new_route):
+
+def add_unique_route(all_unique_routes, all_unique_route_flows, new_route, flow):
     new_tuple = tuple(new_route)
     if new_tuple not in set(map(tuple, all_unique_routes)):
         all_unique_routes.append(new_route)
+        all_unique_route_flows.append(flow)
 
 def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
     # Create a sample network graph 
@@ -120,25 +123,30 @@ def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
 
 
     # Define the evacuation flow (you can adjust this based on your problem)
-    evacuation_flow = start_flow = total_evacuation_flow
+    evacuation_flow = total_evacuation_flow
 
     # Initialize flow on each arc
     nx.set_edge_attributes(G, 0, 'flow')
 
     # Initialize augmented route (minimum cost route)
     unique_routes_taken = []
+    unique_routes_taken_flows = []
     total_time = 0
 
     # print(f"Evacuation flow before allocation: {evacuation_flow}")
     # Find minimum cost route using Bellman-Ford algorithm
     min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
 
-
-
     while evacuation_flow > 0:
         # calculate total time passed for simultaneous routes
         # Find all possible min cost destination that can happen simultaneously and augment flow
-        simultaneous_routes, evacuation_flow = find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow)
+        route_and_route_flows, evacuation_flow = find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow)
+        simultaneous_routes = [route_info[0] for route_info in route_and_route_flows]
+        route_flows = [route_info[1] for route_info in route_and_route_flows]
+        print(len(simultaneous_routes), len(route_flows))
+        print(simultaneous_routes)
+        print(route_flows)
+
         curr_time = 0
         for route in simultaneous_routes:
             curr_time = max(curr_time, calculate_total_time(G, route, intersections))
@@ -150,8 +158,8 @@ def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
         for edge in G.edges():
             G.edges[edge]['flow'] = 0
 
-        for route in simultaneous_routes:
-            add_unique_route(unique_routes_taken, route)
+        for route, flow in zip(simultaneous_routes, route_flows):
+            add_unique_route(unique_routes_taken, unique_routes_taken_flows, route, flow)
         print(f"Evacuation flow after allocation: {evacuation_flow}")
 
 
@@ -159,7 +167,7 @@ def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
     # print(f"Total time: {total_time:.2f} units")
     # print(unique_routes_taken)
 
-    return {'unique_routes_taken': unique_routes_taken, 'total_time': total_time}
+    return {'unique_routes_taken': unique_routes_taken, 'total_time': total_time, 'unique_routes_taken_flows': unique_routes_taken_flows}
     # """print(f"Minimum cost route: {min_cost_route}")"""
 
     # # Visualize the network graph (optional)

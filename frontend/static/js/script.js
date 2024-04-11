@@ -65,28 +65,10 @@ function handleStations(feature, latlng) {
         // Add popup
         marker.bindPopup(popupContent);
         if (interactive) {
-//             marker.on('mouseover', function (e) {
-//                 this.openPopup();
-//             });
-//             marker.on('mouseout', function (e) {
-//                 this.closePopup();
-//             });
-            // Add event listeners for hover inside the circle
             marker.on('click', function (e) {
                 this.openPopup();
             });
-//             marker.on('mouseout', function (e) {
-//                 this.closePopup();
-//             });
-
         }
-        // Set marker interactivity
-        // if (interactive) {
-        //     marker.on('click', function (e) {
-        //         // Call updateValue function when label is clicked
-        //         updateValue(nodes[feature.properties.name].name);
-        //     });
-        // }
         return marker;
     }
 }
@@ -115,7 +97,6 @@ function updateValue(node) {
     // Proceed only if newValue is not empty
     if (node) {
         totalEvacuationFlow = Number(document.getElementById(`node-${node}-evac-num`).value);
-        console.log("got here", totalEvacuationFlow);
         initiateEvacuation(totalEvacuationFlow);
     } else {
         alert(`Please enter a new ${type} value.`);
@@ -138,7 +119,6 @@ window.addEventListener('load', function() {
 
 // Function to initiate the evacuation process
 function initiateEvacuation(totalEvacuationFlow) {
-    console.log("here", totalEvacuationFlow);
     fetch('/api/evacuation', {
         method: 'POST',
         headers: {
@@ -151,6 +131,7 @@ function initiateEvacuation(totalEvacuationFlow) {
         console.log('Evacuation result:', data);
         // Update paths array with unique routes taken
         paths = data.unique_routes_taken;
+        flows = data.unique_routes_taken_flows;
         // Update evacuation time with total time
         evacuation_time = data.total_time.toFixed(2);
         document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`; 
@@ -170,6 +151,7 @@ function updateMarkersOnMap() {
     });
 
     // Call the function to start animating paths
+    console.log("start animating paths")
     animatePaths();
 }
 
@@ -276,55 +258,55 @@ geojsonLayer.eachLayer(function (layer) {
 var evacuationTime = 50; // Initial evacuation time in minutes, adjust as needed
 
 // Define multiple paths
-var paths = [
-    [0, 6, 18],
-    [0, 1, 9, 8, 16],
-    [0, 1, 9, 13],
-    [0, 2, 3, 17],
-    [0, 2, 3, 19]
-];
+var paths = [];
+var flows = [];
 
 // Array to hold animated markers for each path
 var animatedMarkers = [];
 
-// Function to animate a marker along a path
-function animateMarker(marker, path) {
-    var index = 0; // Start from the source node
-    var length = path.length;
-    var duration = 4000; // Duration of animation in milliseconds
-    var startTime; // Variable to store the start time of the animation
+function animateMarker(marker, path, flow) {
+    var index = 0; // Start from the source node
+    var length = path.length;
+    var duration = 4000; // Duration of animation in milliseconds
+    var startTime; // Variable to store the start time of the animation
 
-    function moveMarker() {
-        if (index < length - 1) {
-            var node = nodes[path[index]];
-            var nextNode = nodes[path[index + 1]];
-            if (nextNode) {
-                if (!startTime) {
-                    startTime = new Date().getTime();
-                }
-                var currentTime = new Date().getTime();
-                var elapsedTime = currentTime - startTime;
-                var fraction = elapsedTime / duration;
-                if (fraction < 1) {
-                    var interpolatedLatLng = L.latLng(
-                        node.y + fraction * (nextNode.y - node.y),
-                        node.x + fraction * (nextNode.x - node.x)
-                    );
-                    marker.setLatLng(interpolatedLatLng);
-                } else {
-                    index++;
-                    startTime = null;
-                }
-            } else {
-                clearInterval(marker.interval);
-            }
-        } else {
-            clearInterval(marker.interval);
-        }
-    }
+    function moveMarker() {
+        if (index < length - 1) {
+            var node = nodes[path[index]];
+            var nextNode = nodes[path[index + 1]];
+            if (nextNode) {
+                if (!startTime) {
+                    startTime = new Date().getTime();
+                }
+                var currentTime = new Date().getTime();
+                var elapsedTime = currentTime - startTime;
+                var fraction = elapsedTime / duration;
+                if (fraction < 1) {
+                    var interpolatedLatLng = L.latLng(
+                        node.y + fraction * (nextNode.y - node.y),
+                        node.x + fraction * (nextNode.x - node.x)
+                    );
+                    marker.setLatLng(interpolatedLatLng);
+                    // Calculate flow between current node and next node
+                    var flow_val = flow[index];
+                    // Update flow value dynamically
+                    marker.setRadius(flow_val); // Assuming flow_val represents the flow and it's used to adjust the radius of the marker
+                } else {
+                    index++;
+                    startTime = null;
+                }
+            } else {
+                clearInterval(marker.interval);
+            }
+        } else {
+            clearInterval(marker.interval);
+        }
+    }
 
-    marker.interval = setInterval(moveMarker, 20); // Interval for smoother animation
+    marker.interval = setInterval(moveMarker, 20); // Interval for smoother animation
 }
+
+
 
 // Add CSS for animated markers to display on top
 var animatedMarkerStyle = document.createElement('style');
@@ -339,6 +321,7 @@ document.head.appendChild(animatedMarkerStyle);
 
 // Function to create and animate markers for each path
 function animatePaths() {
+    var i = 0;
     paths.forEach(function(path) {
         var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], { 
             color: 'red', 
@@ -348,7 +331,8 @@ function animatePaths() {
             className: 'animated-marker' // Add class to apply style
         }).addTo(map);
         animatedMarkers.push(marker);
-        animateMarker(marker, path);
+        animateMarker(marker, path, flows[i]);
+        i += 1;
     });
 }
 
