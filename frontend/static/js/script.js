@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([37.5759, 126.9768], 15);
+var map = L.map('map').setView([37.5769, 126.9768], 16);
 
 // Load and display OSM tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -58,17 +58,17 @@ function handleStations(feature, latlng) {
             iconSize: [80, 30],
             iconAnchor: [40, 15]
         });
-        
+
         // Create marker with custom icon
         const marker = L.marker(latlng, { icon: customIcon });
 
         // Add popup
         marker.bindPopup(popupContent);
-        if (interactive) {
-            marker.on('click', function (e) {
-                this.openPopup();
-            });
-        }
+        if (interactive) {
+            marker.on('click', function (e) {
+                this.openPopup();
+            });
+        }
         return marker;
     }
 }
@@ -86,25 +86,26 @@ markerLabelStyle.innerHTML = `
         font-size: 10px;
         text-align: center;
         cursor: pointer;
+        opacity: 1;
     }
 `;
 document.head.appendChild(markerLabelStyle);
 
 // Function to update the values
 function updateValue(node) {
-    console.log(node);
+    console.log(node);
 
-    // Proceed only if newValue is not empty
+    // Proceed only if newValue is not empty
     if (node) {
         totalEvacuationFlow = Number(document.getElementById(`node-${node}-evac-num`).value);
         initiateEvacuation(totalEvacuationFlow);
-    } else {
-        alert(`Please enter a new ${type} value.`);
-    }
+    } else {
+        alert(`Please enter a new ${type} value.`);
+    }
 }
 
 // Add event listener for when the page is fully loaded
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     // Open a popup with instructions when the page is loaded
     var popup = L.popup()
         .setLatLng([37.5759, 126.9768]) // Set coordinates for the popup
@@ -112,7 +113,7 @@ window.addEventListener('load', function() {
         .openOn(map); // Open the popup on the map
 
     // Add event listener to close the popup when clicked
-    map.on('click', function() {
+    map.on('click', function () {
         map.closePopup(popup);
     });
 });
@@ -126,27 +127,27 @@ function initiateEvacuation(totalEvacuationFlow) {
         },
         body: JSON.stringify({ total_evacuation_flow: totalEvacuationFlow })
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Evacuation result:', data);
-        // Update paths array with unique routes taken
-        paths = data.unique_routes_taken;
-        flows = data.unique_routes_taken_flows;
-        // Update evacuation time with total time
-        evacuation_time = data.total_time.toFixed(2);
-        document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`; 
-        // Call function to update markers on the map or perform any other actions
-        updateMarkersOnMap();
-    })
-    .catch(error => {
-        console.error('Error initiating evacuation:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('Evacuation result:', data);
+            // Update paths array with unique routes taken
+            paths = data.unique_routes_taken;
+            flows = data.unique_routes_taken_flows;
+            // Update evacuation time with total time
+            evacuation_time = data.total_time.toFixed(2);
+            document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`;
+            // Call function to update markers on the map or perform any other actions
+            updateMarkersOnMap();
+        })
+        .catch(error => {
+            console.error('Error initiating evacuation:', error);
+        });
 }
 
 // Function to update markers on the map
 function updateMarkersOnMap() {
     // Remove existing animated markers
-    animatedMarkers.forEach(function(marker) {
+    animatedMarkers.forEach(function (marker) {
         marker.remove();
     });
 
@@ -157,80 +158,80 @@ function updateMarkersOnMap() {
 
 // Define the nodes with coordinates and connections
 const nodes = {
-    0: { name: "Gwanghwamun Square", x: 126.9768, y: 37.5759, color: 1, connections: [1, 2] },
-    1: { name: "Sejong Center for the Performing Arts", x: 126.9738, y: 37.5749, color: 2, connections: [0, 4, 9] },
-    2: { name: "Kyobo Book Centre (Main Store)", x: 126.9798, y: 37.5769, color: 2, connections: [0, 3, 7, 11] },
-    3: { name: "Jogyesa Temple", x: 126.9828, y: 37.5759, color: 2, connections: [2, 17, 19] },
-    4: { name: "Seoul Museum of History", x: 126.9718, y: 37.5739, color: 2, connections: [1, 5, 16] },
-    5: { name: "Jeongdok Public Library", x: 126.9718, y: 37.5719, color: 2, connections: [4, 18] },
-    6: { name: "Cheonggyecheon Stream (near Gwanggyo Bridge)", x: 126.9748, y: 37.5719, color: 2, connections: [0, 7, 18] },
-    7: { name: "Bosingak Belfry", x: 126.9798, y: 37.5719, color: 2, connections: [2, 6, 19] },
-    8: { name: "Gyeonghuigung Palace", x: 126.9698, y: 37.5759, color: 2, connections: [9, 14, 16] },
-    9: { name: "Sajik Park", x: 126.9728, y: 37.5789, color: 2, connections: [1, 8, 10, 13] },
-    10: { name: "Jongmyo Shrine", x: 126.9798, y: 37.5789, color: 2, connections: [9, 11, 12] },
-    11: { name: "Changdeokgung Palace", x: 126.9828, y: 37.5799, color: 2, connections: [2, 10, 15] },
-    12: { name: "Changgyeonggung Palace", x: 126.9798, y: 37.5809, color: 2, connections: [10, 13, 15] },
-    13: { name: "Sungkyunkwan University (Main Campus)", x: 126.9728, y: 37.5819, color: 3, connections: [9, 12] },
-    14: { name: "Inwangsan Mountain (Southern trails)", x: 126.9698, y: 37.5819, color: 3, connections: [8] },
-    15: { name: "Naksan Park", x: 126.9828, y: 37.5829, color: 3, connections: [11, 12] },
-    16: { name: "Seoul Science Park", x: 126.9698, y: 37.5809, color: 3, connections: [4, 8, 14] },
-    17: { name: "Unhyeongung Royal Residence", x: 126.9828, y: 37.5759, color: 3, connections: [3] },
-    18: { name: "Marronnier Park", x: 126.9698, y: 37.5719, color: 3, connections: [5, 6] },
-    19: { name: "Dongdaemun Design Plaza (DDP)", x: 126.9828, y: 37.5719, color: 3, connections: [3, 7] },
+    0: { name: "Gwanghwamun Square", x: 126.9768, y: 37.5759, color: 1, connections: [1, 2] },
+    1: { name: "Sejong Center for the Performing Arts", x: 126.9738, y: 37.5749, color: 2, connections: [0, 4, 9] },
+    2: { name: "Kyobo Book Centre (Main Store)", x: 126.9798, y: 37.5769, color: 2, connections: [0, 3, 7, 11] },
+    3: { name: "Jogyesa Temple", x: 126.9828, y: 37.5759, color: 2, connections: [2, 17, 19] },
+    4: { name: "Seoul Museum of History", x: 126.9718, y: 37.5739, color: 2, connections: [1, 5, 16] },
+    5: { name: "Jeongdok Public Library", x: 126.9718, y: 37.5719, color: 2, connections: [4, 18] },
+    6: { name: "Cheonggyecheon Stream (near Gwanggyo Bridge)", x: 126.9748, y: 37.5719, color: 2, connections: [0, 7, 18] },
+    7: { name: "Bosingak Belfry", x: 126.9798, y: 37.5719, color: 2, connections: [2, 6, 19] },
+    8: { name: "Gyeonghuigung Palace", x: 126.9698, y: 37.5759, color: 2, connections: [9, 14, 16] },
+    9: { name: "Sajik Park", x: 126.9728, y: 37.5789, color: 2, connections: [1, 8, 10, 13] },
+    10: { name: "Jongmyo Shrine", x: 126.9798, y: 37.5789, color: 2, connections: [9, 11, 12] },
+    11: { name: "Changdeokgung Palace", x: 126.9828, y: 37.5799, color: 2, connections: [2, 10, 15] },
+    12: { name: "Changgyeonggung Palace", x: 126.9798, y: 37.5809, color: 2, connections: [10, 13, 15] },
+    13: { name: "Sungkyunkwan University (Main Campus)", x: 126.9728, y: 37.5819, color: 3, connections: [9, 12] },
+    14: { name: "Inwangsan Mountain (Southern trails)", x: 126.9698, y: 37.5819, color: 3, connections: [8] },
+    15: { name: "Naksan Park", x: 126.9828, y: 37.5829, color: 3, connections: [11, 12] },
+    16: { name: "Seoul Science Park", x: 126.9698, y: 37.5809, color: 3, connections: [4, 8, 14] },
+    17: { name: "Unhyeongung Royal Residence", x: 126.9828, y: 37.5759, color: 3, connections: [3] },
+    18: { name: "Marronnier Park", x: 126.9698, y: 37.5719, color: 3, connections: [5, 6] },
+    19: { name: "Dongdaemun Design Plaza (DDP)", x: 126.9828, y: 37.5719, color: 3, connections: [3, 7] },
 };
 
 // Initialize the GeoJSON object
 const geojson = {
-    "type": "FeatureCollection",
-    "features": []
+    "type": "FeatureCollection",
+    "features": []
 };
 
 // Define marker colors for each type
 const markerColors = {
-    's': '#000000', // Black for 's'
-    'i': '#FF0000', // Red for 'i'
-    'd': '#0000FF'  // Blue for 'd'
+    's': '#000000', // Black for 's'
+    'i': '#FF0000', // Red for 'i'
+    'd': '#0000FF'  // Blue for 'd'
 };
 
 // Add features for each node
 for (const nodeId in nodes) {
-    const node = nodes[nodeId];
-    const feature = {
-        "type": "Feature",
-        "properties": {
-            "type": "node",
-            "name": nodeId,
-            "color": node.color
-        },
+    const node = nodes[nodeId];
+    const feature = {
+        "type": "Feature",
+        "properties": {
+            "type": "node",
+            "name": nodeId,
+            "color": node.color
+        },
 
-        "geometry": {
-            "type": "Point",
-            "coordinates": [node.x, node.y]
-        }
-    };
-    geojson.features.push(feature);
+        "geometry": {
+            "type": "Point",
+            "coordinates": [node.x, node.y]
+        }
+    };
+    geojson.features.push(feature);
 }
 
 // Add connecting lines
 for (const nodeId in nodes) {
-    const node = nodes[nodeId];
-    for (const connectedNodeId of node.connections) {
-        const line = {
-            "type": "Feature",
-            "properties": {
-                "type": "line",
-                "name": "connect"
-            },
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                    [node.x, node.y],
-                    [nodes[connectedNodeId].x, nodes[connectedNodeId].y]
-                ]
-            }
-        };
-        geojson.features.push(line);
-    }
+    const node = nodes[nodeId];
+    for (const connectedNodeId of node.connections) {
+        const line = {
+            "type": "Feature",
+            "properties": {
+                "type": "line",
+                "name": "connect"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [node.x, node.y],
+                    [nodes[connectedNodeId].x, nodes[connectedNodeId].y]
+                ]
+            }
+        };
+        geojson.features.push(line);
+    }
 }
 
 // Use the generated GeoJSON object directly
@@ -270,6 +271,20 @@ function animateMarker(marker, path, flow) {
     var duration = 4000; // Duration of animation in milliseconds
     var startTime; // Variable to store the start time of the animation
 
+    // Create a text overlay for the marker
+    var textOverlay = L.divIcon({
+        className: 'text-overlay',
+        html: ''
+    });
+
+    // Add the text overlay to the map
+    var textMarker = L.marker(marker.getLatLng(), { icon: textOverlay }).addTo(map);
+
+    // Style the text marker
+    textMarker.getElement().style.color = 'white'; // Make the text white
+    textMarker.getElement().style.fontWeight = 'bold'; // Make the text bold
+
+
     function moveMarker() {
         if (index < length - 1) {
             var node = nodes[path[index]];
@@ -289,8 +304,11 @@ function animateMarker(marker, path, flow) {
                     marker.setLatLng(interpolatedLatLng);
                     // Calculate flow between current node and next node
                     var flow_val = flow[index];
-                    // Update flow value dynamically
-                    marker.setRadius(flow_val); // Assuming flow_val represents the flow and it's used to adjust the radius of the marker
+                    // Update the text overlay dynamically
+                    textMarker.setLatLng(interpolatedLatLng);
+                    textMarker._icon.innerHTML = flow_val.toString();
+                    // Update the radius of the marker dynamically
+                    marker.setRadius(flow_val);
                 } else {
                     index++;
                     startTime = null;
@@ -308,6 +326,7 @@ function animateMarker(marker, path, flow) {
 
 
 
+
 // Add CSS for animated markers to display on top
 var animatedMarkerStyle = document.createElement('style');
 animatedMarkerStyle.type = 'text/css';
@@ -322,19 +341,39 @@ document.head.appendChild(animatedMarkerStyle);
 // Function to create and animate markers for each path
 function animatePaths() {
     var i = 0;
-    paths.forEach(function(path) {
-        var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], { 
-            color: 'red', 
-            fillColor: 'red', 
-            fillOpacity: 2, 
+    paths.forEach(function (path) {
+        var marker = L.circleMarker([nodes[path[0]].y, nodes[path[0]].x], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 2,
             radius: 5,
             className: 'animated-marker' // Add class to apply style
         }).addTo(map);
         animatedMarkers.push(marker);
         animateMarker(marker, path, flows[i]);
         i += 1;
+
+        // Add class to marker labels to adjust their opacity
+        document.querySelectorAll('.marker-label').forEach(function (label) {
+            label.classList.add('opacity-70');
+        });
+
     });
 }
+// Add CSS for animated markers and adjusted marker labels
+var customStyles = document.createElement('style');
+customStyles.type = 'text/css';
+customStyles.innerHTML = `
+    .animated-marker {
+        position: relative;
+        z-index: 1000; /* Set a high z-index value to ensure it appears above other elements */
+    }
+
+    .marker-label.opacity-70 {
+        opacity: 0.7; 
+    }
+`;
+document.head.appendChild(customStyles);
 
 // Call the function to start animating paths
 //animatePaths();
