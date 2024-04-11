@@ -95,6 +95,9 @@ document.head.appendChild(markerLabelStyle);
 function updateValue(node) {
     console.log(node);
 
+    // Close the popup
+    map.closePopup();
+
     // Proceed only if newValue is not empty
     if (node) {
         totalEvacuationFlow = Number(document.getElementById(`node-${node}-evac-num`).value);
