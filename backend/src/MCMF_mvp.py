@@ -113,11 +113,11 @@ def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
     source = '0'
     destinations = ['13','14','15','16','17','18','19','20']
 
-    # Add arcs (replace with your actual arc information)
-    road_section_data = "../backend/data/road_section_data.csv"
+# Add arcs (replace with your actual arc information)
+road_section_data = "../data/road_section_data.csv"
 
-    # Add intersection (replace with actual intersection information)
-    intersection_data = "../backend/data/intersection_capacity.csv"
+# Add intersection (replace with actual intersection information)
+intersection_data = "../data/intersection_capacity.csv"
 
     intersections = read_csv_and_create_graph(road_section_data, intersection_data, G)
 
