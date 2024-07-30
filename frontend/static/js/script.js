@@ -22,8 +22,6 @@ function handleStations(feature, latlng) {
         let interactive = true; // Determine if the marker is interactive
         switch (feature.properties.color) {
             case 1:
-                console.log("here color")
-                console.log(nodes[feature.properties.name].name)
                 markerColor = '#FF0000'; // Red
                 popupContent = `
                     <strong>${nodes[feature.properties.name].name}</strong><br>
@@ -36,12 +34,12 @@ function handleStations(feature, latlng) {
                 `;
                 break;
             case 2:
-                markerColor = '#000000'; //Black
+                markerColor = '#000000'; // Black
                 popupContent = nodes[feature.properties.name].name; // Set popup content to node name
                 interactive = false; // Make marker interactive for non-source nodes
                 break;
             case 3:
-                markerColor = '#0000FF'; //Blue
+                markerColor = '#0000FF'; // Blue
                 popupContent = nodes[feature.properties.name].name; // Set popup content to node name
                 interactive = false; // Make marker interactive for non-source nodes
                 break;
@@ -107,18 +105,37 @@ function updateValue(node) {
     }
 }
 
-// Add event listener for when the page is fully loaded
-window.addEventListener('load', function () {
-    // Open a popup with instructions when the page is loaded
-    var popup = L.popup()
-        .setLatLng([37.5759, 126.9768]) // Set coordinates for the popup
-        .setContent("Click the source node and input total evacuation time.") // Set content for the popup
-        .openOn(map); // Open the popup on the map
+// Function to handle the form submission and send data to the backend
+document.getElementById('vehicle-form').addEventListener('submit', function (e) {
+    e.preventDefault();
 
-    // Add event listener to close the popup when clicked
-    map.on('click', function () {
-        map.closePopup(popup);
-    });
+    const vehicleId = document.getElementById('vehicle-id').value;
+    const vehicleType = document.getElementById('vehicle-type').value;
+    const vehicleCapacity = document.getElementById('vehicle-capacity').value;
+    const vehicleLocation = document.getElementById('vehicle-location').value.split(',').map(Number);
+
+    const vehicleData = {
+        vehicle_id: vehicleId,
+        type: vehicleType,
+        capacity: vehicleCapacity,
+        location: vehicleLocation
+    };
+
+    fetch('/api/add_vehicle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vehicleData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Vehicle added:', data);
+            alert('Vehicle added successfully');
+        })
+        .catch(error => {
+            console.error('Error adding vehicle:', error);
+        });
 });
 
 // Function to initiate the evacuation process
@@ -133,13 +150,10 @@ function initiateEvacuation(totalEvacuationFlow) {
         .then(response => response.json())
         .then(data => {
             console.log('Evacuation result:', data);
-            // Update paths array with unique routes taken
             paths = data.unique_routes_taken;
             flows = data.unique_routes_taken_flows;
-            // Update evacuation time with total time
             evacuation_time = data.total_time.toFixed(2);
             document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`;
-            // Call function to update markers on the map or perform any other actions
             updateMarkersOnMap();
         })
         .catch(error => {
@@ -149,15 +163,13 @@ function initiateEvacuation(totalEvacuationFlow) {
 
 // Function to update markers on the map
 function updateMarkersOnMap() {
-    // Remove existing animated markers
     animatedMarkers.forEach(function (marker) {
         marker.remove();
     });
 
-    // Call the function to start animating paths
-    console.log("start animating paths")
     animatePaths();
 }
+
 
 // Define the nodes with coordinates and connections
 const nodes = {
@@ -193,7 +205,7 @@ const geojson = {
 const markerColors = {
     's': '#000000', // Black for 's'
     'i': '#FF0000', // Red for 'i'
-    'd': '#0000FF'  // Blue for 'd'
+    'd': '#0000FF'  // Blue for 'd'
 };
 
 // Add features for each node
@@ -206,7 +218,6 @@ for (const nodeId in nodes) {
             "name": nodeId,
             "color": node.color
         },
-
         "geometry": {
             "type": "Point",
             "coordinates": [node.x, node.y]
@@ -250,7 +261,7 @@ geojsonLayer.eachLayer(function (layer) {
             markerLabel.addEventListener('click', function () {
                 layer.openPopup();
                 const feature = layer.feature;
-                if (feature.properties && feature.properties.color === 2 || feature.properties.color === 3) {
+                if (feature.properties && (feature.properties.color === 2 || feature.properties.color === 3)) {
                     updateValue(nodes[feature.properties.name].name);
                 }
             });
@@ -286,7 +297,6 @@ function animateMarker(marker, path, flow) {
     // Style the text marker
     textMarker.getElement().style.color = 'white'; // Make the text white
     textMarker.getElement().style.fontWeight = 'bold'; // Make the text bold
-
 
     function moveMarker() {
         if (index < length - 1) {
@@ -327,9 +337,6 @@ function animateMarker(marker, path, flow) {
     marker.interval = setInterval(moveMarker, 20); // Interval for smoother animation
 }
 
-
-
-
 // Add CSS for animated markers to display on top
 var animatedMarkerStyle = document.createElement('style');
 animatedMarkerStyle.type = 'text/css';
@@ -339,7 +346,6 @@ animatedMarkerStyle.innerHTML = `
     }
 `;
 document.head.appendChild(animatedMarkerStyle);
-
 
 // Function to create and animate markers for each path
 function animatePaths() {
@@ -360,9 +366,9 @@ function animatePaths() {
         document.querySelectorAll('.marker-label').forEach(function (label) {
             label.classList.add('opacity-70');
         });
-
     });
 }
+
 // Add CSS for animated markers and adjusted marker labels
 var customStyles = document.createElement('style');
 customStyles.type = 'text/css';
@@ -379,4 +385,4 @@ customStyles.innerHTML = `
 document.head.appendChild(customStyles);
 
 // Call the function to start animating paths
-//animatePaths();
+// animatePaths();
