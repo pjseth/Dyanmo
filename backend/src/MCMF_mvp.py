@@ -1,41 +1,25 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-
-import visualize_graph as visualize
+from data_structures import Vehicle, EvacuationPoint, Route
 
 def read_csv_and_create_graph(road_section_data, intersection_data, G):
-    """
-    Reads a CSV file with specified columns and creates a directed graph.
-
-    Args:
-        csv_file (str): Path to the CSV file.
-        G (Graph): Graph to read and update.
-
-    Returns:
-        nx.DiGraph: Directed graph with edges representing road sections.
-    """
-    # Read the CSV file
     road_section = pd.read_csv(road_section_data)
     intersection = pd.read_csv(intersection_data)
     intersections = {}
 
-    # Extracting data and store in intersections dict
     for _, intersection in intersection.iterrows():    
         start_node, intersection_node, end_node = str(intersection["start_node"]), str(intersection["intersection_node"]), str(intersection["end_node"])
         capacity = intersection["capacity"]
         delay = intersection["delay"]
-        intersections[(start_node, intersection_node, end_node)] = {"capacity":capacity, "delay":delay}
+        intersections[(start_node, intersection_node, end_node)] = {"capacity": capacity, "delay": delay}
 
-    # Iterate through road data and populate graph
     for _, row in road_section.iterrows():
         start_node = str(int(row["starting node of road section"]))
         end_node = str(int(row["ending node of road section"]))
         travel_time = row["travel time (minutes)"]
         travel_capacity = row["traffic capacity (hundreds of vehicles)"]
 
-        # Add edge with weight (travel time) and capacity (traffic capacity)
         G.add_edge(start_node, end_node, weight=travel_time, capacity=travel_capacity)
 
     return intersections
@@ -51,7 +35,6 @@ def calculate_total_time(G, path, intersections):
         total_time += intersections[(start_node, intersection_node, end_node)]['delay']
     
     total_time += G[path[-2]][path[-1]]['weight']
-    # print(total_time)
     return total_time
 
 def find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow):
@@ -65,25 +48,21 @@ def find_possible_destinations(destinations, min_cost_length_and_routes, G, evac
 
     for node, route in filtered_routes.items():
         simultaneous_routes_count = 0
-        routes_with_flow = []  # List to store routes with flow on edges
+        routes_with_flow = []
         
-        # Iterate over the edges in the route
         update_route = True
         flow_to_next_node = np.inf
         for i in range(len(route) - 1):
             node = route[i]
             next_node = route[i+1]
             
-            # Check if the current edge exists in the graph and has enough capacity
             if G[node][next_node]['flow'] <= G[node][next_node]['capacity']:
                 flow_to_next_node = min(G[node][next_node]['capacity'], evacuation_flow)
-                routes_with_flow.append((node, next_node, flow_to_next_node))  # Store edge with flow
+                routes_with_flow.append((node, next_node, flow_to_next_node))
             else:
-                # If any edge in the route doesn't have enough capacity, break the loop
                 update_route = False
                 break
         
-        # augment flow along the minimum cost route
         if update_route:
             simultaneous_routes_count += 1
             flows = []
@@ -93,10 +72,9 @@ def find_possible_destinations(destinations, min_cost_length_and_routes, G, evac
                 flows.append(flow_to_next_node)
             
             evacuation_flow -= flow_to_next_node
-            max_simultaneous_routes.append((route, flows))  # Store route with flow on edges
+            max_simultaneous_routes.append((route, flows))
 
     return max_simultaneous_routes, evacuation_flow
-
 
 def add_unique_route(all_unique_routes, all_unique_route_flows, new_route, flow):
     new_tuple = tuple(new_route)
@@ -104,55 +82,38 @@ def add_unique_route(all_unique_routes, all_unique_route_flows, new_route, flow)
         all_unique_routes.append(new_route)
         all_unique_route_flows.append(flow)
 
-def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow):
-    # Create a sample network graph 
+def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicles, evacuation_points):
     G = nx.DiGraph()
 
-    # Add nodes 
     G.add_nodes_from(['0','1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19','20'])
     source = '0'
     destinations = ['13','14','15','16','17','18','19','20']
 
-# Add arcs (replace with your actual arc information)
-road_section_data = "../data/road_section_data.csv"
-
-# Add intersection (replace with actual intersection information)
-intersection_data = "../data/intersection_capacity.csv"
+    road_section_data = "../data/road_section_data.csv"
+    intersection_data = "../data/intersection_capacity.csv"
 
     intersections = read_csv_and_create_graph(road_section_data, intersection_data, G)
 
-
-    # Define the evacuation flow (you can adjust this based on your problem)
     evacuation_flow = total_evacuation_flow
 
-    # Initialize flow on each arc
     nx.set_edge_attributes(G, 0, 'flow')
 
-    # Initialize augmented route (minimum cost route)
     unique_routes_taken = []
     unique_routes_taken_flows = []
     total_time = 0
 
-    # print(f"Evacuation flow before allocation: {evacuation_flow}")
-    # Find minimum cost route using Bellman-Ford algorithm
     min_cost_length_and_routes = nx.single_source_bellman_ford(G, source=source, weight='weight')
 
     while evacuation_flow > 0:
-        # calculate total time passed for simultaneous routes
-        # Find all possible min cost destination that can happen simultaneously and augment flow
         route_and_route_flows, evacuation_flow = find_possible_destinations(destinations, min_cost_length_and_routes, G, evacuation_flow)
         simultaneous_routes = [route_info[0] for route_info in route_and_route_flows]
         route_flows = [route_info[1] for route_info in route_and_route_flows]
-        print(len(simultaneous_routes), len(route_flows))
-        print(simultaneous_routes)
-        print(route_flows)
 
         curr_time = 0
         for route in simultaneous_routes:
             curr_time = max(curr_time, calculate_total_time(G, route, intersections))
         total_time += curr_time
 
-        # Reset flows to 0 for all edges
         if evacuation_flow <= 0:
             break
         for edge in G.edges():
@@ -160,14 +121,50 @@ intersection_data = "../data/intersection_capacity.csv"
 
         for route, flow in zip(simultaneous_routes, route_flows):
             add_unique_route(unique_routes_taken, unique_routes_taken_flows, route, flow)
-        print(f"Evacuation flow after allocation: {evacuation_flow}")
+
+    vehicle_assignments = assign_vehicles_to_evacuation_points(vehicles, evacuation_points, unique_routes_taken)
+
+    return {
+        'unique_routes_taken': unique_routes_taken,
+        'total_time': total_time,
+        'unique_routes_taken_flows': unique_routes_taken_flows,
+        'vehicle_assignments': vehicle_assignments
+    }
+
+def assign_vehicles_to_evacuation_points(vehicles, evacuation_points, routes):
+    vehicle_assignments = []
+    for vehicle in vehicles:
+        best_point = None
+        best_distance = float('inf')
+        for point in evacuation_points:
+            distance = calculate_distance(vehicle.location, point.location)
+            if distance < best_distance and point.capacity > 0:
+                best_distance = distance
+                best_point = point
+        if best_point:
+            best_point.capacity -= vehicle.capacity
+            vehicle_assignments.append({
+                'vehicle_id': vehicle.vehicle_id,
+                'evacuation_point': best_point.point_id,
+                'route': find_route_for_vehicle(vehicle.location, best_point.location, routes)
+            })
+    return vehicle_assignments
+
+def calculate_distance(location1, location2):
+    return np.linalg.norm(np.array(location1) - np.array(location2))
+
+def find_route_for_vehicle(start, end, routes):
+    for route in routes:
+        if route[0] == start and route[-1] == end:
+            return route
+    return []
 
 
     # print(f"Evacuation flow: {evacuation_flow} (remaining flow)")
     # print(f"Total time: {total_time:.2f} units")
     # print(unique_routes_taken)
 
-    return {'unique_routes_taken': unique_routes_taken, 'total_time': total_time, 'unique_routes_taken_flows': unique_routes_taken_flows}
+    #return {'unique_routes_taken': unique_routes_taken, 'total_time': total_time, 'unique_routes_taken_flows': unique_routes_taken_flows}
     # """print(f"Minimum cost route: {min_cost_route}")"""
 
     # # Visualize the network graph (optional)
