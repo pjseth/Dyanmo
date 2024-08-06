@@ -82,6 +82,29 @@ def add_unique_route(all_unique_routes, all_unique_route_flows, new_route, flow)
         all_unique_routes.append(new_route)
         all_unique_route_flows.append(flow)
 
+def assign_vehicles_to_evacuation_points(vehicles, evacuation_points, routes):
+    vehicle_assignments = []
+    for vehicle in vehicles:
+        best_point = None
+        best_distance = float('inf')
+        for point in evacuation_points:
+            distance = calculate_distance(vehicle.location, point.location)
+            if distance < best_distance and point.capacity > 0:
+                best_distance = distance
+                best_point = point
+        if best_point:
+            best_point.capacity -= vehicle.capacity
+            vehicle_assignments.append({
+                'vehicle_id': vehicle.vehicle_id,
+                'vehicle_type': vehicle.vehicle_type,
+                'vehicle_capacity': vehicle.capacity,
+                'vehicle_location': vehicle.location,
+                'evacuation_point': best_point.point_id,
+                'route': find_route_for_vehicle(vehicle.location, best_point.location, routes),
+                'distance': best_distance
+            })
+    return vehicle_assignments
+
 def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicles, evacuation_points):
     G = nx.DiGraph()
 
@@ -131,24 +154,6 @@ def run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicles
         'vehicle_assignments': vehicle_assignments
     }
 
-def assign_vehicles_to_evacuation_points(vehicles, evacuation_points, routes):
-    vehicle_assignments = []
-    for vehicle in vehicles:
-        best_point = None
-        best_distance = float('inf')
-        for point in evacuation_points:
-            distance = calculate_distance(vehicle.location, point.location)
-            if distance < best_distance and point.capacity > 0:
-                best_distance = distance
-                best_point = point
-        if best_point:
-            best_point.capacity -= vehicle.capacity
-            vehicle_assignments.append({
-                'vehicle_id': vehicle.vehicle_id,
-                'evacuation_point': best_point.point_id,
-                'route': find_route_for_vehicle(vehicle.location, best_point.location, routes)
-            })
-    return vehicle_assignments
 
 def calculate_distance(location1, location2):
     return np.linalg.norm(np.array(location1) - np.array(location2))

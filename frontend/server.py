@@ -120,6 +120,21 @@ def get_capacity_data():
     conn.close()
     return data
 
+@app.route('/api/vehicle_assignments', methods=['POST'])
+def vehicle_assignments():
+    data = request.json
+    total_evacuation_flow = data['total_evacuation_flow']
+    vehicles = data['vehicles']
+    evacuation_points = data['evacuation_points']
+
+    # Convert dictionaries to Vehicle and EvacuationPoint objects
+    vehicle_objs = [Vehicle(**vehicle) for vehicle in vehicles]
+    evacuation_point_objs = [EvacuationPoint(**point) for point in evacuation_points]
+
+    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicle_objs, evacuation_point_objs)
+
+    return jsonify(result)
+
 @app.route('/api/capacities')
 def capacities():
     data = get_capacity_data()
