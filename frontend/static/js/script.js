@@ -138,7 +138,37 @@ document.getElementById('vehicle-form').addEventListener('submit', function (e) 
         });
 });
 
-// Function to initiate the evacuation process
+// Function to create and update the vehicle assignment table
+function updateVehicleAssignmentTable(assignments) {
+    const tableContainer = document.getElementById('vehicle-assignment-table');
+    tableContainer.innerHTML = ''; // Clear previous table content
+
+    const table = document.createElement('table');
+    table.classList.add('assignment-table');
+
+    const headerRow = document.createElement('tr');
+    const headers = ['Vehicle ID', 'Vehicle Type', 'Vehicle Capacity', 'Vehicle Location', 'Evacuation Point', 'Route', 'Distance'];
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    assignments.forEach(assignment => {
+        const row = document.createElement('tr');
+        Object.values(assignment).forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = Array.isArray(value) ? value.join(' -> ') : value;
+            row.appendChild(td);
+        });
+        table.appendChild(row);
+    });
+
+    tableContainer.appendChild(table);
+}
+
+// Function to initiate the evacuation process and update the vehicle assignment table
 function initiateEvacuation(totalEvacuationFlow) {
     fetch('/api/evacuation', {
         method: 'POST',
@@ -147,18 +177,19 @@ function initiateEvacuation(totalEvacuationFlow) {
         },
         body: JSON.stringify({ total_evacuation_flow: totalEvacuationFlow })
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Evacuation result:', data);
-            paths = data.unique_routes_taken;
-            flows = data.unique_routes_taken_flows;
-            evacuation_time = data.total_time.toFixed(2);
-            document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`;
-            updateMarkersOnMap();
-        })
-        .catch(error => {
-            console.error('Error initiating evacuation:', error);
-        });
+    .then(response => response.json())
+    .then(data => {
+        console.log('Evacuation result:', data);
+        paths = data.unique_routes_taken;
+        flows = data.unique_routes_taken_flows;
+        evacuation_time = data.total_time.toFixed(2);
+        document.getElementById('evacuation-time').textContent = `${evacuation_time} minutes`;
+        updateMarkersOnMap();
+        updateVehicleAssignmentTable(data.vehicle_assignments);
+    })
+    .catch(error => {
+        console.error('Error initiating evacuation:', error);
+    });
 }
 
 // Function to update markers on the map
@@ -383,6 +414,7 @@ customStyles.innerHTML = `
     }
 `;
 document.head.appendChild(customStyles);
+document.body.insertAdjacentHTML('beforeend', '<div id="vehicle-assignment-table" class="table-container"></div>');
 
 // Call the function to start animating paths
 // animatePaths();

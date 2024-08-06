@@ -4,6 +4,7 @@ sys.path.append(mcmf_dir)
 
 from flask import Flask, jsonify, send_from_directory, request
 from MCMF_mvp import run_algorithm_with_evacuation_flow
+from data_structures import Vehicle, EvacuationPoint
 import sqlite3
 import os
 
@@ -24,24 +25,21 @@ def rail_network_geojson():
 # Route to handle the request from frontend to run the algorithm
 @app.route('/api/evacuation', methods=['POST'])
 def evacuate():
-    # Get data from the request
     data = request.json
     total_evacuation_flow = data['total_evacuation_flow']
+    vehicles = [Vehicle(**v) for v in data.get('vehicles', [])]
+    evacuation_points = [EvacuationPoint(**e) for e in data.get('evacuation_points', [])]
 
-    # Call the function to run the evacuation algorithm
-    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow)
+    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicles, evacuation_points)
 
-    # Return the result as JSON
     return jsonify(result)
 
 @app.route('/api/updatePopulation', methods=['POST'])
 def update_population():
     data = request.json
     station_id = data['id']
-    print(data)
     new_population = data['newValue']
-    
-    # Update the database with the new population
+
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET current_pop = ? WHERE id = ?", (new_population, station_id))
@@ -56,7 +54,6 @@ def update_capacity():
     station_id = data['id']
     new_capacity = data['newValue']
 
-    # Update the database with the new capacity
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET max_capacity = ? WHERE id = ?", (new_capacity, station_id))
@@ -71,7 +68,6 @@ def update_personnel_needed():
     station_id = data['id']
     new_personnel_needed = data['newValue']
 
-    # Update the database with the new capacity
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET personnel_needed = ? WHERE id = ?", (new_personnel_needed, station_id))
@@ -83,11 +79,9 @@ def update_personnel_needed():
 @app.route('/api/updatePersonnelPresent', methods=['POST'])
 def update_personnel_present():
     data = request.json
-    print(data)
     station_id = data['id']
     new_personnel_present = data['newValue']
 
-    # Update the database with the new capacity
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET personnel_present = ? WHERE id = ?", (new_personnel_present, station_id))
@@ -102,7 +96,6 @@ def update_transport():
     station_id = data['id']
     new_transport = data['newValue']
 
-    # Update the database with the new capacity
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("UPDATE railroads SET transport = ? WHERE id = ?", (new_transport, station_id))
@@ -112,7 +105,6 @@ def update_transport():
     return jsonify({"status": "success", "id": station_id, "new_transport": new_transport})
 
 def get_capacity_data():
-    # Assuming railroads.db is in the same directory as server.py
     conn = sqlite3.connect(os.path.join(app.root_path, 'railroads.db'))
     cursor = conn.cursor()
     cursor.execute("SELECT id, current_pop, max_capacity, personnel_needed, personnel_present, transport FROM railroads")
@@ -124,14 +116,10 @@ def get_capacity_data():
 def vehicle_assignments():
     data = request.json
     total_evacuation_flow = data['total_evacuation_flow']
-    vehicles = data['vehicles']
-    evacuation_points = data['evacuation_points']
+    vehicles = [Vehicle(**v) for v in data['vehicles']]
+    evacuation_points = [EvacuationPoint(**e) for e in data['evacuation_points']]
 
-    # Convert dictionaries to Vehicle and EvacuationPoint objects
-    vehicle_objs = [Vehicle(**vehicle) for vehicle in vehicles]
-    evacuation_point_objs = [EvacuationPoint(**point) for point in evacuation_points]
-
-    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicle_objs, evacuation_point_objs)
+    result = run_algorithm_with_evacuation_flow(mcmf_dir, total_evacuation_flow, vehicles, evacuation_points)
 
     return jsonify(result)
 

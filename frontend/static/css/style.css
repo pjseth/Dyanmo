@@ -38,3 +38,26 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+
+.table-container {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.assignment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.assignment-table th, .assignment-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.assignment-table th {
+    background-color: #f2f2f2;
+}
