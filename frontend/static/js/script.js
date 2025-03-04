@@ -171,13 +171,13 @@ const nodes = {
     10: { name: "Jongmyo Shrine", x: 126.9798, y: 37.5789, color: 2, connections: [9, 11, 12] },
     11: { name: "Changdeokgung Palace", x: 126.9828, y: 37.5799, color: 2, connections: [2, 10, 15] },
     12: { name: "Changgyeonggung Palace", x: 126.9798, y: 37.5809, color: 2, connections: [10, 13, 15] },
-    13: { name: "Sungkyunkwan University (Main Campus)", x: 126.9728, y: 37.5819, color: 3, connections: [9, 12] },
-    14: { name: "Inwangsan Mountain (Southern trails)", x: 126.9698, y: 37.5819, color: 3, connections: [8] },
-    15: { name: "Naksan Park", x: 126.9828, y: 37.5829, color: 3, connections: [11, 12] },
-    16: { name: "Seoul Science Park", x: 126.9698, y: 37.5809, color: 3, connections: [4, 8, 14] },
-    17: { name: "Unhyeongung Royal Residence", x: 126.9828, y: 37.5759, color: 3, connections: [3] },
-    18: { name: "Marronnier Park", x: 126.9698, y: 37.5719, color: 3, connections: [5, 6] },
-    19: { name: "Dongdaemun Design Plaza (DDP)", x: 126.9828, y: 37.5719, color: 3, connections: [3, 7] },
+    13: { name: "RC: Sungkyunkwan University (Main Campus)", x: 126.9728, y: 37.5819, color: 3, connections: [9, 12] },
+    14: { name: "RC: Inwangsan Mountain (Southern trails)", x: 126.9698, y: 37.5819, color: 3, connections: [8] },
+    15: { name: "RC: Naksan Park", x: 126.9828, y: 37.5829, color: 3, connections: [11, 12] },
+    16: { name: "RC: Seoul Science Park", x: 126.9698, y: 37.5809, color: 3, connections: [4, 8, 14] },
+    17: { name: "RC: Unhyeongung Royal Residence", x: 126.9828, y: 37.5759, color: 3, connections: [3] },
+    18: { name: "RC: Marronnier Park", x: 126.9698, y: 37.5719, color: 3, connections: [5, 6] },
+    19: { name: "RC: Dongdaemun Design Plaza (DDP)", x: 126.9828, y: 37.5719, color: 3, connections: [3, 7] },
 };
 
 // Initialize the GeoJSON object
