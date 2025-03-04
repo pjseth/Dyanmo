@@ -30,9 +30,6 @@ function handleStations(feature, latlng) {
                     Total Evacuation Vehicle Number: <span id="vehicle-${feature.id}">${capacityData[feature.id]?.current_population || 'N/A'}</span><br>
                     <input type="number" id="node-${nodes[feature.properties.name].name}-evac-num" placeholder="Enter Number">
                     <button onclick="updateValue('${nodes[feature.properties.name].name}')">Update Vehicle Number</button><br>
-                    Batch Interval: <span id="capacity-${feature.id}">${capacityData[feature.id]?.max_capacity || 'N/A'}</span><br>
-                    <input type="number" id="new-capacity-${feature.id}" placeholder="Enter Number">
-                    <button onclick="updateValue('${feature.id}', 'capacity')">Update Batch Interval</button><br>
                 `;
                 break;
             case 2:
@@ -161,7 +158,7 @@ function updateMarkersOnMap() {
 
 // Define the nodes with coordinates and connections
 const nodes = {
-    0: { name: "Gwanghwamun Square", x: 126.9768, y: 37.5759, color: 1, connections: [1, 2] },
+    0: { name: "AP: Gwanghwamun Square", x: 126.9768, y: 37.5759, color: 1, connections: [1, 2] },
     1: { name: "Sejong Center for the Performing Arts", x: 126.9738, y: 37.5749, color: 2, connections: [0, 4, 9] },
     2: { name: "Kyobo Book Centre (Main Store)", x: 126.9798, y: 37.5769, color: 2, connections: [0, 3, 7, 11] },
     3: { name: "Jogyesa Temple", x: 126.9828, y: 37.5759, color: 2, connections: [2, 17, 19] },
