@@ -13,6 +13,10 @@ app = Flask(__name__, static_url_path='', static_folder='static')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
 
+@app.route('/map')
+def map_page():
+    return send_from_directory(app.static_folder, 'map.html')
+
 @app.route('/<path:path>')
 def static_files(path):
     return send_from_directory(app.static_folder, path)
